@@ -10,7 +10,7 @@ public static class ServiceCollectionExtension
 
     }
 
-    public static IEndpointRouteBuilder AddEndpoints(this IEndpointRouteBuilder app)
+    public static void AddEndpoints(this IEndpointRouteBuilder app)
     {
         var iEndpoint = typeof(IEndpoint);
         var endpoints = Assembly.GetExecutingAssembly()
@@ -22,6 +22,5 @@ public static class ServiceCollectionExtension
             var route = instance?.Register(app);
         }
 
-        return app;
     }
 }
