@@ -1,8 +1,13 @@
+using MusicStream.Domain.Common;
+
 namespace MusicStream.Domain.Entities;
 
-public class Playlist
+public class Playlist : Auditable
 {
+    public Playlist() { }
+
     public Guid Id { get; set; }
     public List<Music> Musics { get; set; } = [];
 
+    public void AddMusic(Music music) => Musics.Add(music);
 }

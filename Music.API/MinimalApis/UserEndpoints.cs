@@ -1,4 +1,6 @@
+using Microsoft.AspNetCore.Mvc;
 using Music.API.Interfaces;
+using MusicStream.Application.Interfaces;
 
 namespace Music.API.MinimalApis;
 
@@ -8,11 +10,16 @@ public class UserEndpoints : IEndpoint
     {
         var group = app.MapGroup("api/v1");
 
-        group.MapGet("users", () =>
+        group.MapGet("upload", async ([FromServices] IFileStorage fileStorage) =>
         {
-            return Results.Ok("users works");
+            await fileStorage.UploadFile("bucket", "myFile", "Hello World");
+            return Results.Ok("Uploaded");
         });
-        group.MapGet("user", () => { });
+        group.MapGet("download", async ([FromServices] IFileStorage fileStorage) =>
+        {
+            var text = await fileStorage.DownloadFile("bucket", "myFile");
+            return Results.Ok(text);
+        });
         group.MapPost("users", () =>
         {
             return Results.Ok("User works");

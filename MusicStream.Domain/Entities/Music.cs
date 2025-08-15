@@ -1,6 +1,8 @@
+using MusicStream.Domain.Common;
+
 namespace MusicStream.Domain.Entities;
 
-public class Music
+public class Music : Auditable
 {
     public Guid Id { get; set; }
     public Singer Singer { get; set; } = new();
