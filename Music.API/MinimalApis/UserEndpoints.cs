@@ -1,8 +1,11 @@
 using Microsoft.AspNetCore.Mvc;
 using Music.API.Interfaces;
+using MusicStream.Application;
 using MusicStream.Application.Interfaces;
 
 namespace Music.API.MinimalApis;
+
+
 
 public class UserEndpoints : IEndpoint
 {
@@ -20,20 +23,21 @@ public class UserEndpoints : IEndpoint
             var text = await fileStorage.DownloadFile("bucket", "myFile");
             return Results.Ok(text);
         });
-        group.MapPost("music", async (IWebHostEnvironment env, IFormFile file, IMusicChannel channel) =>
+        group.MapPost("music", async (IWebHostEnvironment env, [FromForm] IFormFile file, IMusicChannel channel) =>
         {
             var ext = Path.GetExtension(file.FileName);
 
-            var uploadPath = Path.Combine(env.WebRootPath);
+            var uploadPath = Path.Combine(env.WebRootPath, "Temp");
             Directory.CreateDirectory(uploadPath);
-            var storedName = $"{Guid.NewGuid}{ext}";
+            var storedName = $"{Guid.NewGuid()}{ext}";
             var fullPath = Path.Combine(uploadPath, storedName);
             using var fileStream = File.Create(fullPath);
             await file.CopyToAsync(fileStream);
-            await channel.SendAsync(fullPath);
+
+            await channel.SendAsync(new ChannelDto(fullPath, env.WebRootPath, "MyMusic"));
             return Results.Ok("File went to background service");
 
-        });
+        }).DisableAntiforgery();
         group.MapPut("users", () =>
         {
             return Results.Ok();

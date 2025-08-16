@@ -10,6 +10,7 @@ builder.Services.AddApplicationLayer();
 builder.Services.AddApiLayer();
 builder.Services.AddOpenApi();
 var app = builder.Build();
+app.UseStaticFiles();
 app.MapOpenApi();
 app.MapScalarApiReference();
 app.AddEndpoints();
