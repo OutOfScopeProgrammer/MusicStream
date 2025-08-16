@@ -1,19 +1,17 @@
 using System.Diagnostics;
 
-namespace MusicStream.Infrastructure;
+namespace MusicStream.Infrastructure.Processors;
 
 internal class MusicProcessor
 {
     private const string FFMPEGPATH = @"C:\Users\rezaj\AppData\Local\Microsoft\WinGet\Packages\Gyan.FFmpeg.Essentials_Microsoft.Winget.Source_8wekyb3d8bbwe\ffmpeg-7.1.1-essentials_build\bin\ffmpeg.exe";
 
-
-
-    public async Task Convert(string tempFilePath, string fileName)
+    public async Task ConvertToHls(string tempFilePath, string fileName)
     {
-        var task1 = ConvertTo128Kb(tempFilePath, fileName);
-        var task2 = ConvertTo256Kb(tempFilePath, fileName);
-        var task3 = ConvertTo320Kb(tempFilePath, fileName);
-        await Task.WhenAll(task1, task2, task3);
+        var task128 = ConvertTo128Kb(tempFilePath, fileName);
+        var task256 = ConvertTo256Kb(tempFilePath, fileName);
+        var task320 = ConvertTo320Kb(tempFilePath, fileName);
+        await Task.WhenAll(task128, task256, task320);
     }
     private async Task ConvertTo128Kb(string tempFilePath, string fileName)
     {
@@ -48,18 +46,18 @@ internal class MusicProcessor
         const string SEGMENTFORMAT = "audio_%03d.ts";
         string segmentPattern = Path.Combine(directory, SEGMENTFORMAT);
         string playlist = Path.Combine(directory, PLAYLIST);
-        string args = $"-i \"{inputFile}\" -c:a aac -b:a {bitrate} -f hls -hls_time 6 -hls_playlist_type vod -hls_segment_filename \"{segmentPattern}\" \"{playlist}\"";
+        string ffmpegArguments = $"-i \"{inputFile}\" -c:a aac -b:a {bitrate} -f hls -hls_time 6 -hls_playlist_type vod -hls_segment_filename \"{segmentPattern}\" \"{playlist}\"";
+
         var process = new Process()
         {
             StartInfo = new ProcessStartInfo
             {
                 FileName = FFMPEGPATH,
-                Arguments = args,
+                Arguments = ffmpegArguments,
                 RedirectStandardError = true,
                 RedirectStandardOutput = true,
                 UseShellExecute = false,
                 CreateNoWindow = true
-
             }
         };
         process.Start();
