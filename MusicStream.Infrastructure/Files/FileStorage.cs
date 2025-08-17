@@ -20,21 +20,19 @@ internal class FileStorage(MinioConnection minio) : IFileStorage
         .WithFileName(filePath)
         .WithContentType(""));
     }
-    public async Task<string> DownloadFile(string bucket, string key)
+    public async Task<MemoryStream> DownloadFile(string bucket, string key)
     {
-        using var memoryStream = new MemoryStream();
+        var memory = new MemoryStream();
         var args = new GetObjectArgs()
         .WithBucket(bucket)
         .WithObject(key)
         .WithCallbackStream(stream =>
         {
-            stream.CopyTo(memoryStream);
+            stream.CopyTo(memory);
         });
         await Storage.GetObjectAsync(args);
-        memoryStream.Seek(0, SeekOrigin.Begin);
-        using var reader = new StreamReader(memoryStream, Encoding.UTF8);
-        return await reader.ReadToEndAsync();
+        memory.Position = 0;
+        return memory;
     }
-
 
 }

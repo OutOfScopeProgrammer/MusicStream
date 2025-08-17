@@ -30,8 +30,18 @@ public class UserEndpoints : IEndpoint
 
         }).DisableAntiforgery();
 
+        group.MapGet("stream/{musicId}/{fileName}",
+        async (string musicId, string fileName, IFileStorage fileStorage, HttpContext context) =>
+        {
+            Console.WriteLine(".......request");
+            var contentType = fileName.EndsWith(".mpd") ? "application/dash+xml" :
+                              fileName.EndsWith(".m4s") ? "application/iso.segment"
+                              : "application/octet-stream";
+            var key = $"{musicId}/{fileName}";
+            var file = await fileStorage.DownloadFile("music-bucket", key);
+            return Results.File(file, contentType, fileName);
 
-
+        });
         return group;
     }
 }
