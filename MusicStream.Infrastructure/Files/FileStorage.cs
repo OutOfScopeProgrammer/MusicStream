@@ -12,17 +12,13 @@ internal class FileStorage(MinioConnection minio) : IFileStorage
 
 
 
-    public async Task UploadFile(string bucket, string objectName, string content)
+    public async Task UploadFile(string bucket, string objectName, string filePath)
     {
-        var data = Encoding.UTF8.GetBytes(content);
-        var memoryStream = new MemoryStream(data);
-        var args = new PutObjectArgs()
+        await Storage.PutObjectAsync(new PutObjectArgs()
         .WithBucket(bucket)
         .WithObject(objectName)
-        .WithStreamData(memoryStream)
-        .WithObjectSize(memoryStream.Length)
-        .WithContentType("text/plain");
-        await Storage.PutObjectAsync(args);
+        .WithFileName(filePath)
+        .WithContentType(""));
     }
     public async Task<string> DownloadFile(string bucket, string objectName)
     {
@@ -39,4 +35,6 @@ internal class FileStorage(MinioConnection minio) : IFileStorage
         using var reader = new StreamReader(memoryStream, Encoding.UTF8);
         return await reader.ReadToEndAsync();
     }
+
+
 }
