@@ -24,18 +24,7 @@ internal class MusicProcessor
         var outputFile = Path.Combine(rootDirectory, "temp.m4a");
 
         string ffmpegArguments = $"-i \"{tempFilePath}\" -vn -c:a aac -b:a 320k \"{outputFile}\"";
-        var process = new Process()
-        {
-            StartInfo = new ProcessStartInfo
-            {
-                FileName = FFMPEGPATH,
-                Arguments = ffmpegArguments,
-                RedirectStandardError = true,
-                RedirectStandardOutput = true,
-                UseShellExecute = false,
-                CreateNoWindow = true
-            }
-        };
+        var process = ProcessBuilder(ffmpegArguments);
         process.Start();
         string stderr = await process.StandardError.ReadToEndAsync();
         string stdout = await process.StandardOutput.ReadToEndAsync();
@@ -91,18 +80,7 @@ internal class MusicProcessor
 
         string ffmpegArguments = $"-i \"{inputFile}\" -c:a aac -b:a {bitrate} -f hls -hls_time 6 -hls_playlist_type vod -hls_segment_filename \"{segmentPattern}\" \"{playlist}\"";
 
-        var process = new Process()
-        {
-            StartInfo = new ProcessStartInfo
-            {
-                FileName = FFMPEGPATH,
-                Arguments = ffmpegArguments,
-                RedirectStandardError = true,
-                RedirectStandardOutput = true,
-                UseShellExecute = false,
-                CreateNoWindow = true
-            }
-        };
+        var process = ProcessBuilder(ffmpegArguments);
         process.Start();
         string stderr = await process.StandardError.ReadToEndAsync();
         string stdout = await process.StandardOutput.ReadToEndAsync();
@@ -116,4 +94,22 @@ internal class MusicProcessor
             throw new Exception("ffmpeg processing failed");
         }
     }
+
+
+    private Process ProcessBuilder(string ffmpegArguments)
+    => new()
+    {
+        StartInfo = new ProcessStartInfo()
+        {
+            FileName = FFMPEGPATH,
+            Arguments = ffmpegArguments,
+            RedirectStandardError = true,
+            RedirectStandardOutput = true,
+            UseShellExecute = false,
+            CreateNoWindow = true
+
+        }
+    };
+
+
 }
