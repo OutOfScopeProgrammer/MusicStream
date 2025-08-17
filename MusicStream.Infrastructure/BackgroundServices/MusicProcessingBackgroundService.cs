@@ -21,9 +21,10 @@ internal class MusicProcessingBackgroundService(MinioConnection minio, IMusicCha
             if (await channel.WaitToReadAsync())
             {
                 var dto = await channel.ReadAsync();
-                var accFile = await musicProcessor.ConvertToAcc(dto.TempFilePath, dto.RootFolder);
-                await musicProcessor.ConvertToHls(accFile, dto.RootFolder, dto.FileName);
-                var files = GetFiles(Path.Combine(dto.RootFolder, dto.FileName));
+                var outputFolder = Path.Combine(ROOTFOLDER, Path.GetFileName(dto.FileName));
+                Directory.CreateDirectory(outputFolder);
+                await musicProcessor.ConvertForDash(dto.TempFilePath, outputFolder);
+                var files = GetFiles(outputFolder);
                 await BatchUploadToMinio(files);
                 await CleanUpDisk();
             }
@@ -41,19 +42,15 @@ internal class MusicProcessingBackgroundService(MinioConnection minio, IMusicCha
         }
     }
 
-    private List<string> GetFiles(string dirPath)
+    private string[] GetFiles(string dirPath)
     {
-        var list = new List<string>();
-        var dirs = Directory.GetDirectories(dirPath);
-        foreach (var dir in dirs)
-        {
-            list.AddRange(Directory.GetFiles(dir));
-        }
-        return list;
+        var dirs = Directory.GetFiles(dirPath);
+
+        return dirs;
 
     }
 
-    private async Task BatchUploadToMinio(List<string> files)
+    private async Task BatchUploadToMinio(string[] files)
     {
         var tasks = new List<Task>();
         foreach (var file in files)

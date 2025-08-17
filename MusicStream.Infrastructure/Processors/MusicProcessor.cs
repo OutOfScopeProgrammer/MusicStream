@@ -1,113 +1,67 @@
+using System;
 using System.Diagnostics;
+using System.IO;
+using System.Text;
+using System.Threading.Tasks;
 
-namespace MusicStream.Infrastructure.Processors;
-
-internal class MusicProcessor
+namespace MusicStream.Infrastructure.Processors
 {
-    private const string FFMPEGPATH = @"C:\Users\rezaj\AppData\Local\Microsoft\WinGet\Packages\Gyan.FFmpeg.Essentials_Microsoft.Winget.Source_8wekyb3d8bbwe\ffmpeg-7.1.1-essentials_build\bin\ffmpeg.exe";
-
-    public async Task ConvertToHls(string accFile, string rootFolder, string fileName)
+    internal class MusicProcessor
     {
-        var task128 = ConvertTo128Kb(accFile, rootFolder, fileName);
-        var task256 = ConvertTo256Kb(accFile, rootFolder, fileName);
-        var task320 = ConvertTo320Kb(accFile, rootFolder, fileName);
-        await Task.WhenAll(task128, task256, task320);
-    }
+        private const string FFMPEGPATH = @"C:\Users\rezaj\AppData\Local\Microsoft\WinGet\Packages\Gyan.FFmpeg.Essentials_Microsoft.Winget.Source_8wekyb3d8bbwe\ffmpeg-7.1.1-essentials_build\bin\ffmpeg.exe";
 
-    public async Task<string> ConvertToAcc(string tempFilePath, string rootFolder)
-    {
-        var rootDirectory = Path.Combine(rootFolder, "Temp");
-        Directory.CreateDirectory(rootDirectory);
-
-        var outputFile = Path.Combine(rootDirectory, "temp.m4a");
-
-        string ffmpegArguments = $"-i \"{tempFilePath}\" -vn -c:a aac -b:a 320k \"{outputFile}\"";
-        var process = ProcessBuilder(ffmpegArguments);
-        process.Start();
-        string stderr = await process.StandardError.ReadToEndAsync();
-        string stdout = await process.StandardOutput.ReadToEndAsync();
-
-        await process.WaitForExitAsync();
-        if (process.ExitCode != 0)
+        public async Task ConvertForDash(string inputFilePath, string outputFilePath)
         {
-            Console.WriteLine(stderr);
-            Console.WriteLine(stdout);
+            var sb = new StringBuilder();
+            sb.Append($"-i {inputFilePath} ")
+            .Append($"-filter_complex ") // need space at the end
+            .Append($"\"")
+            .Append($"[0:a]aresample=44100[a1];")
+            .Append($"[0:a]aresample=44100[a2];")
+            .Append($"[0:a]aresample=44100[a3];")
+            .Append($"\" ") // need space at the end 
+            .Append($"-map \"[a1]\" -c:a aac -b:a 128k ")
+            .Append($"-map \"[a2]\" -c:a aac -b:a 192k ")
+            .Append($"-map \"[a3]\" -c:a aac -b:a 320k ")
+            .Append($"-f dash ")
+            .Append($"-seg_duration 5 ")
+            .Append($"{outputFilePath}/manifest.mpd");
+            var args = sb.ToString();
 
+            await RunFFmpeg(args);
 
-            throw new Exception(process.ExitCode.ToString());
         }
 
-        return outputFile;
-    }
-    private async Task ConvertTo128Kb(string tempFilePath, string rootFolder, string fileName)
-    {
-        const string BITRATE_128 = "128k";
 
-        var rootDirectory = Path.Combine(rootFolder, fileName);
-        var directory = Path.Combine(rootDirectory, BITRATE_128);
-        Directory.CreateDirectory(directory);
-        await FFmpegProceess(tempFilePath, BITRATE_128, directory);
-
-    }
-
-    private async Task ConvertTo256Kb(string tempFilePath, string rootFolder, string fileName)
-    {
-        const string BITRATE_256 = "256k";
-        var rootDirectory = Path.Combine(rootFolder, fileName);
-        var directory = Path.Combine(rootDirectory, BITRATE_256);
-        Directory.CreateDirectory(directory);
-        await FFmpegProceess(tempFilePath, BITRATE_256, directory);
-    }
-    private async Task ConvertTo320Kb(string tempFilePath, string rootFolder, string fileName)
-    {
-        const string BITRATE_320 = "320k";
-
-        var rootDirectory = Path.Combine(rootFolder, fileName);
-        var directory = Path.Combine(rootDirectory, BITRATE_320);
-        Directory.CreateDirectory(directory);
-        await FFmpegProceess(tempFilePath, BITRATE_320, directory);
-    }
-
-
-    private async Task FFmpegProceess(string inputFile, string bitrate, string directory)
-    {
-        const string PLAYLIST = "playlist.m3u8";
-        const string SEGMENTFORMAT = "audio_%03d.ts";
-        string segmentPattern = Path.Combine(directory, SEGMENTFORMAT);
-        string playlist = Path.Combine(directory, PLAYLIST);
-
-        string ffmpegArguments = $"-i \"{inputFile}\" -c:a aac -b:a {bitrate} -f hls -hls_time 6 -hls_playlist_type vod -hls_segment_filename \"{segmentPattern}\" \"{playlist}\"";
-
-        var process = ProcessBuilder(ffmpegArguments);
-        process.Start();
-        string stderr = await process.StandardError.ReadToEndAsync();
-        string stdout = await process.StandardOutput.ReadToEndAsync();
-
-        await process.WaitForExitAsync();
-        if (process.ExitCode != 0)
+        private async Task RunFFmpeg(string ffmpegArguments)
         {
+            using var process = new Process
+            {
+                StartInfo = new ProcessStartInfo
+                {
+                    FileName = FFMPEGPATH,
+                    Arguments = ffmpegArguments,
+                    RedirectStandardError = true,
+                    RedirectStandardOutput = true,
+                    UseShellExecute = false,
+                    CreateNoWindow = true
+                }
+            };
 
-            Console.WriteLine(stderr);
-            Console.WriteLine(stdout);
-            throw new Exception("ffmpeg processing failed");
+            process.Start();
+
+            string stderr = await process.StandardError.ReadToEndAsync();
+            string stdout = await process.StandardOutput.ReadToEndAsync();
+
+            await process.WaitForExitAsync();
+
+            if (process.ExitCode != 0)
+            {
+                Console.WriteLine("FFmpeg Error:");
+                Console.WriteLine(stderr);
+                Console.WriteLine(stdout);
+                throw new Exception($"FFmpeg exited with code {process.ExitCode}");
+            }
         }
     }
-
-
-    private Process ProcessBuilder(string ffmpegArguments)
-    => new()
-    {
-        StartInfo = new ProcessStartInfo()
-        {
-            FileName = FFMPEGPATH,
-            Arguments = ffmpegArguments,
-            RedirectStandardError = true,
-            RedirectStandardOutput = true,
-            UseShellExecute = false,
-            CreateNoWindow = true
-
-        }
-    };
-
-
 }
