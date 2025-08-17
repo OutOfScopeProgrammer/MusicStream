@@ -11,7 +11,7 @@ namespace MusicStream.Infrastructure.BackgroundServices;
 internal class MusicProcessingBackgroundService(MinioConnection minio, IMusicChannel channel, MusicProcessor musicProcessor) : BackgroundService
 {
     private readonly IMinioClient Storage = minio.Client;
-
+    private const string ROOTFOLDER = @"E:\ASP.NET\MusicStream\Music.APi\wwwroot";
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         while (!stoppingToken.IsCancellationRequested)
@@ -26,7 +26,7 @@ internal class MusicProcessingBackgroundService(MinioConnection minio, IMusicCha
                 await CleanUpDisk(dto.TempFilePath);
                 var files = GetFiles(Path.Combine(dto.RootFolder, "MyMusic"));
                 await BatchUploadToMinio(files);
-                // TODO: Process music and put it in the minio
+                // TODO: Delete the Music file after upload
             }
 
         }
@@ -60,7 +60,7 @@ internal class MusicProcessingBackgroundService(MinioConnection minio, IMusicCha
         {
             tasks.Add(Task.Run(() =>
             {
-                var relativePath = Path.GetRelativePath(@"E:\ASP.NET\MusicStream\Music.APi\wwwroot", file);
+                var relativePath = Path.GetRelativePath(ROOTFOLDER, file);
                 var key = relativePath.Replace("\\", "/");
                 Storage.PutObjectAsync(new PutObjectArgs()
        .WithBucket("music-bucket")

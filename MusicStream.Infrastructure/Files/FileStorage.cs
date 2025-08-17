@@ -12,20 +12,20 @@ internal class FileStorage(MinioConnection minio) : IFileStorage
 
 
 
-    public async Task UploadFile(string bucket, string objectName, string filePath)
+    public async Task UploadFile(string bucket, string key, string filePath)
     {
         await Storage.PutObjectAsync(new PutObjectArgs()
         .WithBucket(bucket)
-        .WithObject(objectName)
+        .WithObject(key)
         .WithFileName(filePath)
         .WithContentType(""));
     }
-    public async Task<string> DownloadFile(string bucket, string objectName)
+    public async Task<string> DownloadFile(string bucket, string key)
     {
         using var memoryStream = new MemoryStream();
         var args = new GetObjectArgs()
         .WithBucket(bucket)
-        .WithObject(objectName)
+        .WithObject(key)
         .WithCallbackStream(stream =>
         {
             stream.CopyTo(memoryStream);
