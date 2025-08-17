@@ -6,7 +6,7 @@ internal class MusicProcessor
 {
     private const string FFMPEGPATH = @"C:\Users\rezaj\AppData\Local\Microsoft\WinGet\Packages\Gyan.FFmpeg.Essentials_Microsoft.Winget.Source_8wekyb3d8bbwe\ffmpeg-7.1.1-essentials_build\bin\ffmpeg.exe";
 
-    public async Task ConvertToHls(string accFile, string tempFilePath, string rootFolder, string fileName)
+    public async Task ConvertToHls(string accFile, string rootFolder, string fileName)
     {
         var task128 = ConvertTo128Kb(accFile, rootFolder, fileName);
         var task256 = ConvertTo256Kb(accFile, rootFolder, fileName);
@@ -16,7 +16,6 @@ internal class MusicProcessor
 
     public async Task<string> ConvertToAcc(string tempFilePath, string rootFolder)
     {
-        string fileName = Guid.NewGuid().ToString();
         var rootDirectory = Path.Combine(rootFolder, "Temp");
         Directory.CreateDirectory(rootDirectory);
 

@@ -1,3 +1,3 @@
 namespace MusicStream.Application;
 
-public record ChannelDto(string TempFilePath, string RootFolder, string FileName);
+public record MusicChannelMessage(string TempFilePath, string RootFolder, string FileName);

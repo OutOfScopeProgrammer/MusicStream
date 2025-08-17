@@ -2,8 +2,8 @@ namespace MusicStream.Application.Interfaces;
 
 public interface IMusicChannel
 {
-    Task SendAsync(ChannelDto item);
-    Task<ChannelDto> ReadAsync();
+    Task SendAsync(MusicChannelMessage item);
+    Task<MusicChannelMessage> ReadAsync();
     Task<bool> WaitToReadAsync();
 
 }

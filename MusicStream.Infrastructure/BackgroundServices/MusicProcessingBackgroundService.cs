@@ -22,11 +22,10 @@ internal class MusicProcessingBackgroundService(MinioConnection minio, IMusicCha
             {
                 var dto = await channel.ReadAsync();
                 var accFile = await musicProcessor.ConvertToAcc(dto.TempFilePath, dto.RootFolder);
-                await musicProcessor.ConvertToHls(accFile, dto.TempFilePath, dto.RootFolder, dto.FileName);
-                await CleanUpDisk(dto.TempFilePath);
-                var files = GetFiles(Path.Combine(dto.RootFolder, "MyMusic"));
+                await musicProcessor.ConvertToHls(accFile, dto.RootFolder, dto.FileName);
+                var files = GetFiles(Path.Combine(dto.RootFolder, dto.FileName));
                 await BatchUploadToMinio(files);
-                // TODO: Delete the Music file after upload
+                await CleanUpDisk();
             }
 
         }
@@ -34,11 +33,12 @@ internal class MusicProcessingBackgroundService(MinioConnection minio, IMusicCha
 
 
 
-    private async Task CleanUpDisk(string filePath)
+    private async Task CleanUpDisk()
     {
-        var dir = Path.GetDirectoryName(filePath);
-        if (Directory.Exists(dir))
+        foreach (var dir in Directory.GetDirectories(ROOTFOLDER))
+        {
             await Task.Run(() => Directory.Delete(dir, true));
+        }
     }
 
     private List<string> GetFiles(string dirPath)
@@ -58,15 +58,15 @@ internal class MusicProcessingBackgroundService(MinioConnection minio, IMusicCha
         var tasks = new List<Task>();
         foreach (var file in files)
         {
-            tasks.Add(Task.Run(() =>
+            tasks.Add(Task.Run(async () =>
             {
                 var relativePath = Path.GetRelativePath(ROOTFOLDER, file);
                 var key = relativePath.Replace("\\", "/");
-                Storage.PutObjectAsync(new PutObjectArgs()
-       .WithBucket("music-bucket")
-       .WithObject(key)
-       .WithFileName(file)
-       .WithContentType(""));
+                await Storage.PutObjectAsync(new PutObjectArgs()
+        .WithBucket("music-bucket")
+        .WithObject(key)
+        .WithFileName(file)
+        .WithContentType(""));
             }));
         }
 

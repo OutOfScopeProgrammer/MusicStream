@@ -6,7 +6,7 @@ namespace MusicStream.Infrastructure.BackgroundServices;
 
 public class MusicChannel : IMusicChannel
 {
-    private Channel<ChannelDto> _channel;
+    private Channel<MusicChannelMessage> _channel;
     public MusicChannel()
     {
         var option = new UnboundedChannelOptions()
@@ -14,14 +14,14 @@ public class MusicChannel : IMusicChannel
             SingleReader = true,
             SingleWriter = false
         };
-        _channel = Channel.CreateUnbounded<ChannelDto>(option);
+        _channel = Channel.CreateUnbounded<MusicChannelMessage>(option);
     }
 
 
-    public async Task SendAsync(ChannelDto item)
+    public async Task SendAsync(MusicChannelMessage item)
         => await _channel.Writer.WriteAsync(item);
     public async Task<bool> WaitToReadAsync() => await _channel.Reader.WaitToReadAsync();
-    public async Task<ChannelDto> ReadAsync()
+    public async Task<MusicChannelMessage> ReadAsync()
         => await _channel.Reader.ReadAsync();
 
 
