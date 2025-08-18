@@ -17,7 +17,7 @@ public class UserEndpoints : IEndpoint
         group.MapPost("music", async (IWebHostEnvironment env, [FromForm] IFormFile file, IMusicChannel channel) =>
         {
             var ext = Path.GetExtension(file.FileName);
-
+            var fileName = Path.GetFileNameWithoutExtension(file.FileName);
             var uploadPath = Path.Combine(env.WebRootPath, "Temp");
             Directory.CreateDirectory(uploadPath);
             var storedName = $"{Guid.NewGuid()}{ext}";
@@ -25,7 +25,7 @@ public class UserEndpoints : IEndpoint
             using var fileStream = File.Create(fullPath);
             await file.CopyToAsync(fileStream);
 
-            await channel.SendAsync(new(fullPath, env.WebRootPath, storedName));
+            await channel.SendAsync(new(fullPath, env.WebRootPath, fileName));
             return Results.Ok("File went to background service");
 
         }).DisableAntiforgery();

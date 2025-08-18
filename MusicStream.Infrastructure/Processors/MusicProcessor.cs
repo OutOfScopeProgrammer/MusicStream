@@ -7,10 +7,10 @@ namespace MusicStream.Infrastructure.Processors
     {
         private const string FFMPEGPATH = @"C:\Users\rezaj\AppData\Local\Microsoft\WinGet\Packages\Gyan.FFmpeg.Essentials_Microsoft.Winget.Source_8wekyb3d8bbwe\ffmpeg-7.1.1-essentials_build\bin\ffmpeg.exe";
 
-        public async Task ConvertForDash(string inputFilePath, string outputFilePath)
+        public async Task ConvertForDash(string inputFile, string outputFolder)
         {
             var sb = new StringBuilder();
-            sb.Append($"-i {inputFilePath} ")
+            sb.Append($"-i {inputFile} ")
             .Append($"-filter_complex ") // need space at the end
             .Append($"\"")
             .Append($"[0:a]aresample=44100[a1];")
@@ -22,7 +22,7 @@ namespace MusicStream.Infrastructure.Processors
             .Append($"-map \"[a3]\" -c:a aac -b:a 320k ")
             .Append($"-f dash ")
             .Append($"-seg_duration 5 ")
-            .Append($"{outputFilePath}/manifest.mpd");
+            .Append($"{outputFolder}/manifest.mpd");
             var args = sb.ToString();
 
             await RunFFmpeg(args);

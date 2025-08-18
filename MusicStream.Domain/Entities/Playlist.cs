@@ -8,6 +8,7 @@ public class Playlist : Auditable
 
     public Guid Id { get; set; }
     public List<Music> Musics { get; set; } = [];
+    public Subscription Subscription { get; set; } = new();
 
     public void AddMusic(Music music) => Musics.Add(music);
 }

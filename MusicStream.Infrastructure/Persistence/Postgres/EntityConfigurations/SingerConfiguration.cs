@@ -1,0 +1,18 @@
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using MusicStream.Domain.Entities;
+
+namespace MusicStream.Infrastructure.Persistence.Postgres.EntityConfigurations;
+
+public class SingerConfiguration : IEntityTypeConfiguration<Singer>
+{
+    public void Configure(EntityTypeBuilder<Singer> builder)
+    {
+        builder.HasKey(s => s.Id);
+        builder.Property(s => s.FirstName).HasMaxLength(50);
+        builder.Property(s => s.LastName).HasMaxLength(50);
+        builder.HasMany<Music>()
+        .WithOne(m => m.Singer);
+
+    }
+}

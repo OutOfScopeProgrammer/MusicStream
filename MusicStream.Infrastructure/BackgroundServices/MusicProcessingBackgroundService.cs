@@ -15,17 +15,19 @@ internal class MusicProcessingBackgroundService(MinioConnection minio, IMusicCha
     {
         while (!stoppingToken.IsCancellationRequested)
         {
-            Console.WriteLine("Processing....");
 
             if (await channel.WaitToReadAsync())
             {
                 var dto = await channel.ReadAsync();
-                var outputFolder = Path.Combine(ROOTFOLDER, Path.GetFileName(dto.FileName));
+                Console.WriteLine("Processing....");
+                var outputFolder = Path.Combine(ROOTFOLDER, dto.FileName);
                 Directory.CreateDirectory(outputFolder);
                 await musicProcessor.ConvertForDash(dto.TempFilePath, outputFolder);
                 var files = GetFiles(outputFolder);
+                Console.WriteLine("Sending to minio....");
                 await BatchUploadToMinio(files);
                 await CleanUpDisk();
+                var streamUrl = $"{dto.FileName}/manifest.mpd";
             }
 
         }
