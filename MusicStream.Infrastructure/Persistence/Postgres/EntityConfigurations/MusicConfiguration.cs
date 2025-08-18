@@ -11,6 +11,9 @@ public class MusicConfiguration : IEntityTypeConfiguration<Music>
         builder.HasKey(m => m.Id);
         builder.Property(m => m.Title).HasMaxLength(50).IsRequired();
         builder.Property(m => m.Description).HasMaxLength(150);
+        builder.HasOne(m => m.Playlist)
+        .WithMany(p => p.Musics)
+        .HasForeignKey(m => m.PlaylistId);
 
 
     }
