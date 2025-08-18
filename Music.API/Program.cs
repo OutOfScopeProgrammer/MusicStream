@@ -5,9 +5,9 @@ using MusicStream.Infrastructure.Extensions;
 using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddApiLayer(builder.Configuration);
 builder.Services.AddInfrastructureLayer(builder.Configuration);
 builder.Services.AddApplicationLayer();
-builder.Services.AddApiLayer();
 builder.Services.AddOpenApi();
 var app = builder.Build();
 app.UseStaticFiles();

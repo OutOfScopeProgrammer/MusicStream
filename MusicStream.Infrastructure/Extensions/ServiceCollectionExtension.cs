@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using MusicStream.Application.Interfaces;
+using MusicStream.Infrastructure.Auth;
 using MusicStream.Infrastructure.BackgroundServices;
 using MusicStream.Infrastructure.Files;
 using MusicStream.Infrastructure.Persistence.Minio;
@@ -16,6 +17,7 @@ public static class ServiceCollectionExtension
     {
         services.AddMinio(configuration);
         services.AddPostgres(configuration);
+        services.AddAuthServices(configuration);
         services.AddScoped<IMusicStorage, MusicStorage>();
         services.AddScoped<IBucketManager, BucketManager>();
         services.AddSingleton<IMusicChannel, MusicChannel>();
@@ -25,7 +27,7 @@ public static class ServiceCollectionExtension
 
     private static void AddMinio(this IServiceCollection services, IConfiguration configuration)
     {
-        var minioConfig = configuration.GetSection("minio")
+        var minioConfig = configuration.GetSection(nameof(MinioOption))
         ?? throw new Exception("mino config is null");
 
         services.AddOptions<MinioOption>().Bind(config: minioConfig);
@@ -44,6 +46,14 @@ public static class ServiceCollectionExtension
             option.EnableSensitiveDataLogging();
             option.EnableDetailedErrors();
         });
+    }
+
+    private static void AddAuthServices(this IServiceCollection services, IConfiguration configuration)
+    {
+        var jwtOption = configuration.GetSection(nameof(JwtOption))
+        ?? throw new Exception("Jwt setting are null");
+        services.AddOptions<JwtOption>().Bind(jwtOption);
+
     }
 
 }
