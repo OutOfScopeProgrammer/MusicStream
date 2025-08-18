@@ -1,3 +1,4 @@
+using System.Formats.Asn1;
 using Microsoft.EntityFrameworkCore;
 using MusicStream.Application.Interfaces.Repositories;
 using MusicStream.Domain.Entities;
@@ -18,18 +19,18 @@ internal class PlaylistRepository(AppDbContext dbContext) : IPlayListRepository
     }
     public void AddPlaylist(Playlist playlist)
      => dbContext.Playlists.Add(playlist);
-    public Task<List<Playlist>> GetPlaylistsByUserId(Guid userId, bool asNoTracking, CancellationToken cancellationToken)
+
+
+
+    public async Task<List<Music>> GetMusicsByPlaylistId(Guid playlistId, bool asNoTracking, CancellationToken cancellationToken)
     {
-        var query = dbContext.Playlists;
+        var query = dbContext.Musics;
         if (asNoTracking)
             query.AsNoTracking();
-
-        var playlists = query.Include(p => p.Subscription)
-            .Where(p => p.Subscription.UserId == userId).ToListAsync(cancellationToken);
-        return playlists;
+        var musics = await query.Where(m => m.PlaylistId == playlistId)
+            .ToListAsync(cancellationToken);
+        return musics;
     }
-
     public async Task SaveChangesAsync(CancellationToken cancellationToken)
     => await dbContext.SaveChangesAsync(cancellationToken);
-
 }
