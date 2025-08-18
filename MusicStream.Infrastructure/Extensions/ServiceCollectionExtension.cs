@@ -13,7 +13,7 @@ public static class ServiceCollectionExtension
     public static void AddInfrastructureLayer(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddMinio(configuration);
-        services.AddScoped<IFileStorage, FileStorage>();
+        services.AddScoped<IMusicStorage, MusicStorage>();
         services.AddScoped<IBucketManager, BucketManager>();
         services.AddSingleton<IMusicChannel, MusicChannel>();
         services.AddHostedService<MusicProcessingBackgroundService>();

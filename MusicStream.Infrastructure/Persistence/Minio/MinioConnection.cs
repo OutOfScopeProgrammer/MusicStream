@@ -13,7 +13,7 @@ internal class MinioConnection
         Client = new MinioClient()
         .WithEndpoint(config.Endpoint)
         .WithCredentials(config.UserName, config.Password)
-        .WithSSL(config.WithSll)
+        .WithSSL(config.WithSsl)
         .Build();
 
     }

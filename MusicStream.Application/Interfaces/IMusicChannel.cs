@@ -1,5 +1,7 @@
 namespace MusicStream.Application.Interfaces;
 
+public record MusicChannelMessage(string TempFilePath, string RootFolder, string FileName);
+
 public interface IMusicChannel
 {
     Task SendAsync(MusicChannelMessage item);
