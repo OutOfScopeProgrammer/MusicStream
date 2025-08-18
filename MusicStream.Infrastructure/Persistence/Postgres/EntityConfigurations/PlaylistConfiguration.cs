@@ -9,5 +9,7 @@ public class PlaylistConfiguration : IEntityTypeConfiguration<Playlist>
     public void Configure(EntityTypeBuilder<Playlist> builder)
     {
         builder.HasKey(p => p.Id);
+        builder.HasOne(p => p.Subscription)
+        .WithMany(s => s.Playlists).HasForeignKey(p => p.SubscriptionId);
     }
 }

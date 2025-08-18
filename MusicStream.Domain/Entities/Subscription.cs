@@ -9,6 +9,8 @@ public class Subscription : Auditable
     public int PlaylistLimit { get; set; }
     public List<Playlist> Playlists { get; set; } = [];
     public User User { get; set; } = new();
+    public Guid UserId { get; set; }
+
 
     public static Subscription Create(int playListLimit, User user)
     => new()

@@ -1,5 +1,4 @@
 using System.Threading.Channels;
-using MusicStream.Application;
 using MusicStream.Application.Interfaces;
 
 namespace MusicStream.Infrastructure.BackgroundServices;

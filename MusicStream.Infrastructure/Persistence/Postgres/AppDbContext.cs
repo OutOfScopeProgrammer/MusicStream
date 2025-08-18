@@ -4,7 +4,7 @@ using MusicStream.Domain.Entities;
 
 namespace MusicStream.Infrastructure.Persistence.Postgres;
 
-public class AppContext(DbContextOptions<AppContext> options) : DbContext(options)
+internal class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(options)
 {
     public DbSet<User> Users { get; set; }
     public DbSet<Music> Musics { get; set; }

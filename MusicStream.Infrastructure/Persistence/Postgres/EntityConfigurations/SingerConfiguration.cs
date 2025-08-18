@@ -11,8 +11,9 @@ public class SingerConfiguration : IEntityTypeConfiguration<Singer>
         builder.HasKey(s => s.Id);
         builder.Property(s => s.FirstName).HasMaxLength(50);
         builder.Property(s => s.LastName).HasMaxLength(50);
-        builder.HasMany<Music>()
-        .WithOne(m => m.Singer);
+        builder.HasMany(s => s.Musics)
+        .WithOne(m => m.Singer)
+        .HasForeignKey(m => m.SingerId);
 
     }
 }
