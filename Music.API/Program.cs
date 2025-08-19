@@ -17,4 +17,5 @@ app.AddEndpoints();
 using var scope = app.Services.CreateScope();
 var connection = scope.ServiceProvider.GetRequiredService<IBucketManager>();
 await connection.MainBucketInitializer();
+app.MapControllers();
 app.Run();
