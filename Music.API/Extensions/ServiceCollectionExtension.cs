@@ -48,7 +48,7 @@ public static class ServiceCollectionExtension
                 }
             };
 
-            var jwtOption = configuration.GetSection("JwtSetting").Get<JwtOption>()
+            var jwtOption = configuration.GetSection(nameof(JwtOption)).Get<JwtOption>()
              ?? throw new Exception("Something is wrong with Jwt token setting");
 
 

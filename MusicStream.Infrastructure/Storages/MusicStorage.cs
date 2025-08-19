@@ -3,7 +3,7 @@ using Minio.DataModel.Args;
 using MusicStream.Application.Interfaces;
 using MusicStream.Infrastructure.Persistence.Minio;
 
-namespace MusicStream.Infrastructure.Files;
+namespace MusicStream.Infrastructure.Storages;
 
 internal class MusicStorage(MinioConnection minio) : IMusicStorage
 {
@@ -33,6 +33,24 @@ internal class MusicStorage(MinioConnection minio) : IMusicStorage
         await Storage.GetObjectAsync(args);
         memory.Position = 0;
         return memory;
+    }
+    public async Task BatchUploadToMinio(string[] files, string rootFolder)
+    {
+        var tasks = new List<Task>();
+        foreach (var file in files)
+        {
+            var relativePath = Path.GetRelativePath(rootFolder, file);
+            var key = relativePath.Replace("\\", "/");
+            var task = Storage.PutObjectAsync(new PutObjectArgs()
+                .WithBucket("music-bucket")
+                .WithObject(key)
+                .WithFileName(file)
+                .WithContentType(""));
+
+            tasks.Add(task);
+        }
+        await Task.WhenAll(tasks);
+
     }
 
 }

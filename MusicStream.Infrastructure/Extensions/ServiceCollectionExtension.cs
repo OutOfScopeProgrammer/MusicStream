@@ -2,12 +2,14 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using MusicStream.Application.Interfaces;
+using MusicStream.Application.Interfaces.Repositories;
 using MusicStream.Infrastructure.Auth;
 using MusicStream.Infrastructure.BackgroundServices;
-using MusicStream.Infrastructure.Files;
+using MusicStream.Infrastructure.Storages;
 using MusicStream.Infrastructure.Persistence.Minio;
 using MusicStream.Infrastructure.Persistence.Postgres;
 using MusicStream.Infrastructure.Processors;
+using MusicStream.Infrastructure.Repositories;
 
 namespace MusicStream.Infrastructure.Extensions;
 
@@ -18,11 +20,12 @@ public static class ServiceCollectionExtension
         services.AddMinio(configuration);
         services.AddPostgres(configuration);
         services.AddAuthServices(configuration);
-        services.AddScoped<IMusicStorage, MusicStorage>();
+        services.AddSingleton<IMusicStorage, MusicStorage>();
         services.AddScoped<IBucketManager, BucketManager>();
         services.AddSingleton<IMusicChannel, MusicChannel>();
         services.AddHostedService<MusicProcessingBackgroundService>();
         services.AddSingleton<MusicProcessor>();
+        services.AddScoped<IMusicRepository, MusicRepository>();
     }
 
     private static void AddMinio(this IServiceCollection services, IConfiguration configuration)

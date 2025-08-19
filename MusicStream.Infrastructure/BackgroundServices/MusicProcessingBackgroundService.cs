@@ -1,15 +1,21 @@
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Minio;
 using Minio.DataModel.Args;
 using MusicStream.Application.Interfaces;
 using MusicStream.Infrastructure.Persistence.Minio;
+using MusicStream.Infrastructure.Persistence.Postgres;
 using MusicStream.Infrastructure.Processors;
 
 namespace MusicStream.Infrastructure.BackgroundServices;
 
-internal class MusicProcessingBackgroundService(MinioConnection minio, IMusicChannel channel, MusicProcessor musicProcessor) : BackgroundService
+internal class MusicProcessingBackgroundService
+(IMusicStorage musicStorage,
+IMusicChannel channel,
+ MusicProcessor musicProcessor,
+ IServiceScopeFactory scopeFactory) : BackgroundService
 {
-    private readonly IMinioClient Storage = minio.Client;
     private const string ROOTFOLDER = @"E:\ASP.NET\MusicStream\Music.APi\wwwroot";
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
@@ -19,15 +25,24 @@ internal class MusicProcessingBackgroundService(MinioConnection minio, IMusicCha
             if (await channel.WaitToReadAsync())
             {
                 var dto = await channel.ReadAsync();
+
                 Console.WriteLine("Processing....");
+
                 var outputFolder = Path.Combine(ROOTFOLDER, dto.FileName);
                 Directory.CreateDirectory(outputFolder);
+
                 await musicProcessor.ConvertForDash(dto.TempFilePath, outputFolder);
+
                 var files = GetFiles(outputFolder);
                 Console.WriteLine("Sending to minio....");
-                await BatchUploadToMinio(files);
+
+                await musicStorage.BatchUploadToMinio(files, ROOTFOLDER);
+
                 await CleanUpDisk();
+                //TODO: update music streamUrl
                 var streamUrl = $"{dto.FileName}/manifest.mpd";
+                await UpdateMusicStreamUrl(dto.musciEntityId, streamUrl);
+
             }
 
         }
@@ -51,23 +66,16 @@ internal class MusicProcessingBackgroundService(MinioConnection minio, IMusicCha
 
     }
 
-    private async Task BatchUploadToMinio(string[] files)
-    {
-        var tasks = new List<Task>();
-        foreach (var file in files)
-        {
-            tasks.Add(Task.Run(async () =>
-            {
-                var relativePath = Path.GetRelativePath(ROOTFOLDER, file);
-                var key = relativePath.Replace("\\", "/");
-                await Storage.PutObjectAsync(new PutObjectArgs()
-        .WithBucket("music-bucket")
-        .WithObject(key)
-        .WithFileName(file)
-        .WithContentType(""));
-            }));
-        }
 
-        await Task.WhenAll(tasks);
+
+    private async Task UpdateMusicStreamUrl(Guid musicId, string streamUrl)
+    {
+        using var scope = scopeFactory.CreateScope();
+        var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        await dbContext.Musics.Where(m => m.Id == musicId)
+        .ExecuteUpdateAsync(set =>
+        set.SetProperty(m => m.StreamUrl, m => streamUrl));
     }
+
+
 }
