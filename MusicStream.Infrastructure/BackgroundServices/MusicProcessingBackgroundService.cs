@@ -36,7 +36,6 @@ IMusicChannel channel,
                 await musicStorage.BatchUploadToMinio(files, ROOTFOLDER);
 
                 await CleanUpDisk();
-                //TODO: update music streamUrl
                 var streamUrl = $"{dto.FileName}/manifest.mpd";
                 await UpdateMusicStreamUrl(dto.musciEntityId, streamUrl);
 

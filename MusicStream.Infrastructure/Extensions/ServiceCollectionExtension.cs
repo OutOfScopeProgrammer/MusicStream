@@ -26,6 +26,7 @@ public static class ServiceCollectionExtension
         services.AddHostedService<MusicProcessingBackgroundService>();
         services.AddSingleton<MusicProcessor>();
         services.AddScoped<IMusicRepository, MusicRepository>();
+        services.AddScoped<ISingerRepository, SingerRepository>();
     }
 
     private static void AddMinio(this IServiceCollection services, IConfiguration configuration)

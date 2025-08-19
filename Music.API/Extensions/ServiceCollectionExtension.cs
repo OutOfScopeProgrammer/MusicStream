@@ -1,5 +1,6 @@
 using System.Reflection;
 using System.Text;
+using FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Music.API.Interfaces;
@@ -12,6 +13,7 @@ public static class ServiceCollectionExtension
     public static void AddApiLayer(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddAuth(configuration);
+        services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
     }
 
     public static void AddEndpoints(this IEndpointRouteBuilder app)

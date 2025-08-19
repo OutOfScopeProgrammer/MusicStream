@@ -1,7 +1,7 @@
 using Music.API.Interfaces;
 using MusicStream.Application.Interfaces;
 
-namespace Music.API.MinimalApis;
+namespace Music.API.Api.Endpoints;
 
 public class StreamEndpoint : IEndpoint
 {
@@ -22,7 +22,8 @@ public class StreamEndpoint : IEndpoint
             var file = await fileStorage.DownloadFile(key);
             return Results.File(file, contentType, fileName);
 
-        });
+        })
+        .WithName("Stream");
         group.DisableAntiforgery();
         return group;
     }

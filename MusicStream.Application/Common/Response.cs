@@ -6,10 +6,10 @@ public class Response
 {
     public bool IsSuccess { get; set; }
     public string? Error { get; set; } = string.Empty;
-    private Response(bool isSucess, string? error)
+    private Response(bool isSucess, string? errors)
     {
         IsSuccess = isSucess;
-        Error = error ?? Error;
+        Error = errors ?? Error;
     }
 
     public static Response Succeed() => new(true, null);
@@ -21,14 +21,14 @@ public class Response<T>
     [MemberNotNullWhen(true, nameof(Data))]
     public bool IsSuccess { get; set; }
     public T? Data { get; set; }
-    public string? Error { get; set; } = string.Empty;
+    public string Error { get; set; } = string.Empty;
     private Response(T? data, bool isSucess, string? error)
     {
         Data = data;
         IsSuccess = isSucess;
         Error = error ?? Error;
     }
-    private Response(bool isSucess, string? error)
+    private Response(bool isSucess, string error)
     {
         IsSuccess = isSucess;
         Error = error ?? Error;
