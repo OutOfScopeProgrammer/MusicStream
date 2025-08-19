@@ -10,6 +10,8 @@ using MusicStream.Infrastructure.Persistence.Minio;
 using MusicStream.Infrastructure.Persistence.Postgres;
 using MusicStream.Infrastructure.Processors;
 using MusicStream.Infrastructure.Repositories;
+using Microsoft.EntityFrameworkCore.Diagnostics;
+using MusicStream.Infrastructure.Persistence.Postgres.Interceptors;
 
 namespace MusicStream.Infrastructure.Extensions;
 
@@ -43,9 +45,12 @@ public static class ServiceCollectionExtension
         var connectionString = configuration.GetConnectionString("Postgres")
         ?? throw new Exception("connetion string for postgres is null");
 
-
-        services.AddDbContext<AppDbContext>(option =>
+        services.AddScoped<IInterceptor, AuditableInterceptor>();
+        services.AddDbContext<AppDbContext>((provider, option) =>
         {
+            var interceptors = provider.GetServices<IInterceptor>()
+            ?? throw new Exception("problem with Interceptors");
+            option.AddInterceptors(interceptors);
             option.UseNpgsql(connectionString);
             option.EnableSensitiveDataLogging();
             option.EnableDetailedErrors();
