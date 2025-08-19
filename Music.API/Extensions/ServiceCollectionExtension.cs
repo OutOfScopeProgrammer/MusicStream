@@ -15,8 +15,8 @@ public static class ServiceCollectionExtension
     {
         services.AddControllers();
         services.AddAuth(configuration);
-        services.AddFluentValidationAutoValidation();
-        services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
+        services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly())
+        .AddFluentValidationAutoValidation();
     }
 
     public static void AddEndpoints(this IEndpointRouteBuilder app)

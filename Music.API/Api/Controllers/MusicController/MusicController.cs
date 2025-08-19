@@ -1,12 +1,9 @@
-using System.ComponentModel;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
-using Music.API.Api.Endpoints.MusicEndpoints;
 using Music.API.Helper;
 using MusicStream.Application.Interfaces.Repositories;
 using MusicStream.Application.Services;
 
-namespace Music.API.Api.Controllers
+namespace Music.API.Api.Controllers.MusicController
 {
     [ApiController]
     [Route("api/v1/[controller]")]
@@ -40,6 +37,7 @@ namespace Music.API.Api.Controllers
         [EndpointSummary("Create music")]
         public async Task<IActionResult> CreateMusic([FromForm] CreateMusicDto dto, CancellationToken cancellationToken)
         {
+
             var (fullPath, fileName, uploadPath) = FileHelper.PrepareFileForSaving(dto.File.FileName, env.WebRootPath);
             Directory.CreateDirectory(uploadPath);
 

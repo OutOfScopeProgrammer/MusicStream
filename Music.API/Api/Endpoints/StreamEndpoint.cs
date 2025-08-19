@@ -23,7 +23,10 @@ public class StreamEndpoint : IEndpoint
             return Results.File(file, contentType, fileName);
 
         })
-        .WithName("Stream");
+        .WithName("Stream")
+        .WithTags("Stream")
+        .WithDescription("اندپویند استریم موسیقی")
+        .WithSummary("Stream endpoint");
         group.DisableAntiforgery();
         return group;
     }

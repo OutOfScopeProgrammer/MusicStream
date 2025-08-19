@@ -1,5 +1,5 @@
 
-namespace Music.API.Api.Endpoints.MusicEndpoints;
+namespace Music.API.Api.Controllers.MusicController;
 
 public static class MusicDtoMapper
 {
