@@ -1,10 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Minio;
-using Minio.DataModel.Args;
 using MusicStream.Application.Interfaces;
-using MusicStream.Infrastructure.Persistence.Minio;
 using MusicStream.Infrastructure.Persistence.Postgres;
 using MusicStream.Infrastructure.Processors;
 

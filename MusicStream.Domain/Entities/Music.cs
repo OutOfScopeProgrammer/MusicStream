@@ -14,4 +14,13 @@ public class Music : Auditable
     public Singer? Singer { get; set; } = new();
     public Guid? SingerId { get; set; }
 
+    public static Music Create(string title, string description, Singer singer)
+        => new()
+        {
+            Title = title,
+            Description = description,
+            Singer = singer,
+            SingerId = singer.Id
+        };
+
 }

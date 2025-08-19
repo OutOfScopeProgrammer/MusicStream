@@ -1,8 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
+using Music.API.Helper;
 using Music.API.Interfaces;
-using MusicStream.Application.Interfaces;
-using MusicStream.Application.Interfaces.Repositories;
-using MusicStream.Domain.Entities;
+using MusicStream.Application.Services;
 
 namespace Music.API.MinimalApis;
 
@@ -17,29 +16,27 @@ public class UserEndpoints : IEndpoint
 
 
         group.MapPost("music", async
-        (IWebHostEnvironment env, [FromForm] CreateMusicDto dto, IMusicChannel channel, [FromServices] IMusicRepository musicRepository) =>
+        (IWebHostEnvironment env, [FromForm] CreateMusicDto dto,
+        [FromServices] MusicService musicService, CancellationToken cancellationToken) =>
         {
-            var ext = Path.GetExtension(dto.File.FileName);
-            var fileName = Path.GetFileNameWithoutExtension(dto.File.FileName);
-            var uploadPath = Path.Combine(env.WebRootPath, "Temp");
+            var (fullPath, fileName, uploadPath) = FileHelper.PrepareFileForSaving(dto.File.FileName, env.WebRootPath);
             Directory.CreateDirectory(uploadPath);
-            var storedName = $"{Guid.NewGuid()}{ext}";
-            var fullPath = Path.Combine(uploadPath, storedName);
+
             using var fileStream = File.Create(fullPath);
             await dto.File.CopyToAsync(fileStream);
+            var response = await musicService
+            .CreateMusic(dto.Title, dto.Description, fullPath, env.WebRootPath,
+             fileName, dto.SingerId, cancellationToken);
 
-            var music = new MusicStream.Domain.Entities.Music();
-            music.Title = dto.Title;
-            music.Description = dto.Description;
-            music.SingerId = music.SingerId;
-            musicRepository.AddMusic(music);
-            await musicRepository.SaveChangesAsync(CancellationToken.None);
-            await channel.SendAsync(new(fullPath, env.WebRootPath, fileName, music.Id));
-            return Results.Ok("File went to background service");
+            return response.IsSuccess
+            ? Results.Ok("File is in processing queue")
+            : Results.NotFound(response.Error);
 
-        }).DisableAntiforgery();
+        }).Produces(StatusCodes.Status200OK)
+        .Produces(StatusCodes.Status404NotFound);
+        // TODO: add validator
 
 
-        return group;
+        return group.DisableAntiforgery();
     }
 }
