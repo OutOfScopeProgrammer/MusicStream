@@ -17,7 +17,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Api\Docs\" />
     <Folder Include="wwwroot\" />
   </ItemGroup>
 
