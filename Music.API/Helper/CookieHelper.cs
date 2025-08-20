@@ -1,6 +1,3 @@
-using Microsoft.Extensions.Options;
-using MusicStream.Infrastructure.Auth;
-
 namespace Music.API.Helper;
 
 public static class CookieHelper
