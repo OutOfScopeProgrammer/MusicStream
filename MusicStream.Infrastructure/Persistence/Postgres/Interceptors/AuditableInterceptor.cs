@@ -4,7 +4,7 @@ using MusicStream.Domain.Common;
 
 namespace MusicStream.Infrastructure.Persistence.Postgres.Interceptors;
 
-public class AuditableInterceptor : SaveChangesInterceptor
+internal class AuditableInterceptor : SaveChangesInterceptor
 {
     public override InterceptionResult<int> SavingChanges(DbContextEventData eventData, InterceptionResult<int> result)
     {

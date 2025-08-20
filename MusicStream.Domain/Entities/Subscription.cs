@@ -16,12 +16,21 @@ public class Subscription : Auditable
     public Guid UserId { get; set; }
 
 
-    public static Subscription Create(int playListLimit, User user)
-    => new()
+    public static Subscription Create(SubscriptionType type)
     {
-        PlaylistLimit = playListLimit,
-        User = user
-    };
+        var sub = new Subscription();
+        var limit = type switch
+        {
+            SubscriptionType.Free => 0,
+            SubscriptionType.Basic => 2,
+            SubscriptionType.Premium => 10,
+            _ => 0
+        };
+        sub.PlaylistLimit = limit;
+        return sub;
+    }
+
+
 
 
     public bool TryAddPlaylist(Playlist playList)
@@ -35,14 +44,5 @@ public class Subscription : Auditable
     }
 
 
-    public void SetPlaylistLimit()
-    {
-        PlaylistLimit = SubscriptionType switch
-        {
-            SubscriptionType.Free => 0,
-            SubscriptionType.Basic => 2,
-            SubscriptionType.Premium => 10,
-            _ => 0
-        };
-    }
+
 }

@@ -4,7 +4,7 @@ using MusicStream.Application.Interfaces;
 namespace MusicStream.Infrastructure.BackgroundServices;
 
 
-public class MusicChannel : IMusicChannel
+internal class MusicChannel : IMusicChannel
 {
     private Channel<MusicChannelMessage> _channel;
     public MusicChannel()

@@ -4,7 +4,7 @@ using MusicStream.Domain.Entities;
 
 namespace MusicStream.Infrastructure.Persistence.Postgres.EntityConfigurations;
 
-public class MusicConfiguration : IEntityTypeConfiguration<Music>
+internal class MusicConfiguration : IEntityTypeConfiguration<Music>
 {
     public void Configure(EntityTypeBuilder<Music> builder)
     {
