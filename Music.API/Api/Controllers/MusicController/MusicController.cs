@@ -22,7 +22,7 @@ namespace Music.API.Api.Controllers.MusicController
         {
 
             var musics = await musicRepository.GetMusics(cancellationToken);
-            if (musics is null)
+            if (musics!.Count == 0)
                 return NotFound(ApiResponse<List<MusicDto>>.NotFound("musics not found."));
             var dtos = MusicDtoMapper.ToMusicDto(musics, linkGenerator, HttpContext);
 

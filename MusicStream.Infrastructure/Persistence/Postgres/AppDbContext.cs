@@ -11,6 +11,9 @@ internal class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(
     public DbSet<Subscription> Subscriptions { get; set; }
     public DbSet<Singer> Singers { get; set; }
     public DbSet<Playlist> Playlists { get; set; }
+    public DbSet<RefreshToken> RefreshTokens { get; set; }
+
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());

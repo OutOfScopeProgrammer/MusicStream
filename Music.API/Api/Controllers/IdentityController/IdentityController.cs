@@ -16,14 +16,14 @@ namespace Music.API.Api.Controllers.IdentityController
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [EndpointSummary("Sign Up")]
-        public async Task<IActionResult> SignUp([FromBody] IdentityDto dto)
+        public async Task<ActionResult<IdentityResponse>> SignUp([FromBody] IdentityDto dto)
         {
             var result = await authService.CreateUserWithFreeSubscription(dto.PhoneNumber, dto.Password);
             if (!result.IsSuccess)
                 return BadRequest(ApiResponse<IActionResult>.BadRequest(result.Error));
             CookieHelper.SetCookie(HttpContext, result.Data.AccessToken, options.Value.ExpirationInMinutes);
             // TODO: return refreshToken
-            return Ok(ApiResponse<IActionResult>.Ok());
+            return Ok(ApiResponse<IdentityResponse>.Ok(new IdentityResponse(result.Data.RefreshToken)));
         }
     }
 }
