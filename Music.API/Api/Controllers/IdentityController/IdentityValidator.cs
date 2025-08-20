@@ -9,8 +9,8 @@ public class IdentityValidator : AbstractValidator<IdentityDto>
         RuleLevelCascadeMode = CascadeMode.Stop;
         RuleFor(i => i.PhoneNumber).MaximumLength(11).NotEmpty().NotNull().WithMessage("Phone number is required")
         .Must(ValidPhoneNumber).WithMessage("Phone number should start with \"09\" ");
-        RuleFor(i => i.Password).NotEmpty().NotNull().MinimumLength(8)
-        .WithMessage("Password is required")
+        RuleFor(i => i.Password).NotEmpty().NotNull().WithMessage("Password is required")
+        .MinimumLength(8).WithMessage("password minimum legth is 8")
         .Must(IsComplexEnough).WithMessage("password must contain number, upper case and lower case.");
     }
 
