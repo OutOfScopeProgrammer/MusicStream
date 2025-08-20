@@ -12,7 +12,7 @@ internal class AuthService
 {
 
 
-    public async Task<Response<AuthResult>> CreateUserWithFreeSubscriptionType(string phoneNumber, string password)
+    public async Task<Response<AuthResult>> CreateUserWithFreeSubscription(string phoneNumber, string password)
     {
         var exist = await userRepository.GetUserByPhoneNumber(phoneNumber, true, CancellationToken.None) is not null;
         if (exist)

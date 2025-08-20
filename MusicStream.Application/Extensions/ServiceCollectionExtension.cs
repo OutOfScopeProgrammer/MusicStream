@@ -1,6 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
 using MusicStream.Application.Services;
-using MusicStream.Domain.Entities;
 
 namespace MusicStream.Application.Extensions;
 
