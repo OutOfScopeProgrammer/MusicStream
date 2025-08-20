@@ -10,6 +10,8 @@ public class SubscriptionConfiguration : IEntityTypeConfiguration<Subscription>
     {
         builder.HasKey(s => s.Id);
         builder.Property(s => s.PlaylistLimit).IsRequired();
+        builder.Property(s => s.SubscriptionType).IsRequired()
+        .HasConversion<string>();
 
     }
 

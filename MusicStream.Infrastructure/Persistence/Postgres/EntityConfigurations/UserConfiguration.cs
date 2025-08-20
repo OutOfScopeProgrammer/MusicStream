@@ -10,10 +10,13 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
     {
 
         builder.HasKey(u => u.Id);
-        builder.Property(u => u.Username).HasMaxLength(50);
+        builder.Property(u => u.PhoneNumber).HasMaxLength(11).IsRequired();
         builder.Property(u => u.HashedPassword).IsRequired();
         builder.HasOne(u => u.Subscription)
         .WithOne(s => s.User)
         .HasForeignKey<Subscription>(s => s.UserId);
+
+
+        builder.HasIndex(u => u.PhoneNumber).IsUnique();
     }
 }

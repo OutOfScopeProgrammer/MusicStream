@@ -11,9 +11,9 @@ internal class SubscriptionRepository(AppDbContext dbContext) : ISubscriptionRep
 
     public async Task<List<Playlist>> GetPlayistsByUserId(Guid userId, bool asNoTracking, CancellationToken cancellationToken)
     {
-        var query = dbContext.Playlists;
+        var query = dbContext.Playlists.AsQueryable();
         if (asNoTracking)
-            query.AsNoTracking();
+            query = query.AsNoTracking();
         var playlists = await query.Include(p => p.Subscription)
         .Where(p => p.Subscription.UserId == userId).ToListAsync(cancellationToken);
         return playlists;
@@ -22,9 +22,9 @@ internal class SubscriptionRepository(AppDbContext dbContext) : ISubscriptionRep
         => dbContext.Subscriptions.Add(subscription);
     public async Task<Subscription?> GetSubscriptionById(Guid subscriptionId, bool asNoTracking, CancellationToken cancellationToken)
     {
-        var query = dbContext.Subscriptions;
+        var query = dbContext.Subscriptions.AsQueryable();
         if (asNoTracking)
-            query.AsNoTracking();
+            query = query.AsNoTracking();
         return await query.SingleOrDefaultAsync(s => s.Id == subscriptionId, cancellationToken);
     }
     public async Task SaveChangesAsync(CancellationToken cancellationToken)

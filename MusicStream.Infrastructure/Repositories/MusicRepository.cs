@@ -10,15 +10,15 @@ internal class MusicRepository(AppDbContext dbContext) : IMusicRepository
 
     public async Task<Music?> GetMusicById(Guid musicId, bool asNoTracking, CancellationToken cancellationToken)
     {
-        var query = dbContext.Musics;
+        var query = dbContext.Musics.AsQueryable();
         if (asNoTracking)
-            query.AsNoTracking();
+            query = query.AsNoTracking();
         return await query.SingleOrDefaultAsync(m => m.Id == musicId, cancellationToken);
     }
 
     public async Task<List<Music>?> GetMusics(CancellationToken cancellationToken)
     {
-        return await dbContext.Musics.ToListAsync(cancellationToken);
+        return await dbContext.Musics.AsNoTracking().ToListAsync(cancellationToken);
     }
     public void AddMusic(Music music)
     => dbContext.Add(music);

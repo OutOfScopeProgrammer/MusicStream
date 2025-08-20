@@ -1,5 +1,7 @@
+using System.Dynamic;
 using System.Text.Json.Serialization;
 using MusicStream.Domain.Common;
+using MusicStream.Domain.Enums;
 
 namespace MusicStream.Domain.Entities;
 
@@ -7,8 +9,8 @@ public class Subscription : Auditable
 {
     public Subscription() { }
     public Guid Id { get; set; }
+    public SubscriptionType SubscriptionType { get; set; }
     public int PlaylistLimit { get; set; }
-    [JsonIgnore]
     public List<Playlist> Playlists { get; set; } = [];
     public User User { get; set; } = new();
     public Guid UserId { get; set; }
@@ -30,5 +32,17 @@ public class Subscription : Auditable
             return true;
         }
         return false;
+    }
+
+
+    public void SetPlaylistLimit()
+    {
+        PlaylistLimit = SubscriptionType switch
+        {
+            SubscriptionType.Free => 0,
+            SubscriptionType.Basic => 2,
+            SubscriptionType.Premium => 10,
+            _ => 0
+        };
     }
 }

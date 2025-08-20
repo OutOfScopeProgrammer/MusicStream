@@ -6,7 +6,7 @@ public class User : Auditable
 {
     public User() { }
     public Guid Id { get; set; }
-    public string Username { get; set; } = string.Empty;
+    public string PhoneNumber { get; set; } = string.Empty;
     public string HashedPassword { get; set; } = string.Empty;
 
     public Subscription Subscription { get; set; } = new();
@@ -16,7 +16,11 @@ public class User : Auditable
         Subscription = subscription;
     }
 
-    public static User Create(string userName) => new() { Username = userName };
+    public static User Create(string phoneNumber) => new()
+    {
+        PhoneNumber = phoneNumber,
+
+    };
 
     public void SetHashedPassword(string hashedPassword) => HashedPassword = hashedPassword;
 }

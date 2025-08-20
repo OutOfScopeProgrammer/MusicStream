@@ -12,9 +12,9 @@ internal class SingerRepository(AppDbContext dbContext) : ISingerRepository
 
     public async Task<Singer?> GetSingerById(Guid singerId, bool asNoTracking, CancellationToken cancellationToken)
     {
-        var query = dbContext.Singers;
+        var query = dbContext.Singers.AsQueryable();
         if (asNoTracking)
-            query.AsNoTracking();
+            query = query.AsNoTracking();
 
         return await query.SingleOrDefaultAsync(s => s.Id == singerId, cancellationToken);
     }
@@ -22,9 +22,9 @@ internal class SingerRepository(AppDbContext dbContext) : ISingerRepository
 
     public async Task<Singer?> GetSingerByIdWithMusics(Guid singerId, bool asNoTracking, CancellationToken cancellationToken)
     {
-        var query = dbContext.Singers;
+        var query = dbContext.Singers.AsQueryable();
         if (asNoTracking)
-            query.AsNoTracking();
+            query = query.AsNoTracking();
         return await query.Include(s => s.Musics)
         .SingleOrDefaultAsync(s => s.Id == singerId, cancellationToken);
     }

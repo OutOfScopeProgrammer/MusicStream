@@ -9,9 +9,9 @@ internal class UserRepository(AppDbContext dbContext) : IUserRepository
 {
     public Task<User?> GetUserById(Guid userId, bool asNoTracking, CancellationToken cancellationToken)
     {
-        var query = dbContext.Users;
+        var query = dbContext.Users.AsQueryable();
         if (asNoTracking)
-            query.AsNoTracking();
+            query = query.AsNoTracking();
         return query.SingleOrDefaultAsync(u => u.Id == userId, cancellationToken);
     }
 

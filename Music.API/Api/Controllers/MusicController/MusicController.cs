@@ -16,8 +16,8 @@ namespace Music.API.Api.Controllers.MusicController
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [EndpointDescription("دریافت لیست تمام موسیقی ها")]
         [EndpointSummary("Get list of all musics")]
+
         public async Task<ActionResult<List<MusicDto>>> GetMusics(CancellationToken cancellationToken)
         {
 
@@ -26,6 +26,20 @@ namespace Music.API.Api.Controllers.MusicController
                 return NotFound();
             var dtos = MusicDtoMapper.ToMusicDto(musics, linkGenerator, HttpContext);
             return Ok(dtos);
+        }
+        [HttpGet("{musicId:guid}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [EndpointSummary("Get Music by id")]
+        public async Task<ActionResult<MusicDto>> GetMusicById(Guid musicId, CancellationToken cancellationToken)
+        {
+            var music = await musicRepository.GetMusicById(musicId, true, cancellationToken);
+            if (music is null)
+                return NotFound();
+            var dto = MusicDtoMapper.ToMusicDto(music, linkGenerator, HttpContext);
+            return Ok(dto);
+
         }
 
 
