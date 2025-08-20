@@ -3,10 +3,11 @@ using System.Security.Claims;
 using System.Text;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using MusicStream.Application.Interfaces.Auth;
 
 namespace MusicStream.Infrastructure.Auth;
 
-internal class TokenGenerator(IOptions<JwtOption> jwtOption)
+internal class TokenGenerator(IOptions<JwtOption> jwtOption) : ITokenGenerator
 {
     private readonly JwtOption option = jwtOption.Value;
 
@@ -30,4 +31,8 @@ internal class TokenGenerator(IOptions<JwtOption> jwtOption)
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
 
+    public string RefreshToken()
+    {
+        throw new NotImplementedException();
+    }
 }

@@ -13,9 +13,14 @@ var app = builder.Build();
 app.UseStaticFiles();
 app.MapOpenApi();
 app.MapScalarApiReference();
-app.AddEndpoints();
+
+app.UseAuthentication();
+app.UseAuthorization();
+
 using var scope = app.Services.CreateScope();
 var connection = scope.ServiceProvider.GetRequiredService<IBucketManager>();
 await connection.MainBucketInitializer();
+
+app.AddEndpoints();
 app.MapControllers();
 app.Run();

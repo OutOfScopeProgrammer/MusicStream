@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using MusicStream.Domain.Common;
 
 namespace MusicStream.Domain.Entities;
@@ -9,7 +10,8 @@ public class User : Auditable
     public string PhoneNumber { get; set; } = string.Empty;
     public string HashedPassword { get; set; } = string.Empty;
 
-    public Subscription Subscription { get; set; } = new();
+    [JsonIgnore]
+    public Subscription? Subscription { get; set; }
 
     public void SetSubscription(Subscription subscription)
     {

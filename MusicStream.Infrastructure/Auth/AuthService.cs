@@ -7,7 +7,7 @@ using MusicStream.Domain.Entities;
 namespace MusicStream.Infrastructure.Auth;
 
 internal class AuthService
-(IUserRepository userRepository, TokenGenerator tokenGenerator
+(IUserRepository userRepository, ITokenGenerator tokenGenerator
 , IPasswordHasher<User> passwordHasher) : IAuthService
 {
 

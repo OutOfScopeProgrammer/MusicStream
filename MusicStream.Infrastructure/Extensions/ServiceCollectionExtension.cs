@@ -12,6 +12,9 @@ using MusicStream.Infrastructure.Processors;
 using MusicStream.Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using MusicStream.Infrastructure.Persistence.Postgres.Interceptors;
+using MusicStream.Application.Interfaces.Auth;
+using Microsoft.AspNetCore.Identity;
+using MusicStream.Domain.Entities;
 
 namespace MusicStream.Infrastructure.Extensions;
 
@@ -29,6 +32,7 @@ public static class ServiceCollectionExtension
         services.AddSingleton<MusicProcessor>();
         services.AddScoped<IMusicRepository, MusicRepository>();
         services.AddScoped<ISingerRepository, SingerRepository>();
+        services.AddScoped<IUserRepository, UserRepository>();
     }
 
     private static void AddMinio(this IServiceCollection services, IConfiguration configuration)
@@ -49,7 +53,7 @@ public static class ServiceCollectionExtension
         services.AddDbContext<AppDbContext>((provider, option) =>
         {
             var interceptors = provider.GetServices<IInterceptor>()
-            ?? throw new Exception("problem with Interceptors");
+            ?? throw new Exception("problem with interceptors");
             option.AddInterceptors(interceptors);
             option.UseNpgsql(connectionString);
             option.EnableSensitiveDataLogging();
@@ -59,9 +63,10 @@ public static class ServiceCollectionExtension
 
     private static void AddAuthServices(this IServiceCollection services, IConfiguration configuration)
     {
-        var jwtOption = configuration.GetSection(nameof(JwtOption))
-        ?? throw new Exception("Jwt setting are null");
-        services.AddOptions<JwtOption>().Bind(jwtOption);
+        services.Configure<JwtOption>(configuration.GetSection(nameof(JwtOption)));
+        services.AddSingleton<ITokenGenerator, TokenGenerator>();
+        services.AddScoped<IAuthService, AuthService>();
+        services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
 
     }
 

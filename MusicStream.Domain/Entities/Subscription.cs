@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using MusicStream.Domain.Common;
 using MusicStream.Domain.Enums;
 
@@ -9,8 +10,11 @@ public class Subscription : Auditable
     public Guid Id { get; set; }
     public SubscriptionType SubscriptionType { get; set; }
     public int PlaylistLimit { get; set; }
+    [JsonIgnore]
     public List<Playlist> Playlists { get; set; } = [];
-    public User User { get; set; } = new();
+
+    [JsonIgnore]
+    public User? User { get; set; }
     public Guid UserId { get; set; }
 
 
