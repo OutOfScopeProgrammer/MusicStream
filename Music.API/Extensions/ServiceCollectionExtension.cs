@@ -23,15 +23,7 @@ public static class ServiceCollectionExtension
             .ToDictionary(
                 kvp => kvp.Key,
                 kvp => kvp.Value?.Errors.Select(e => e.ErrorMessage).ToList());
-                var response = new ApiResponse<object>()
-                {
-                    StatusCode = StatusCodes.Status400BadRequest,
-                    Message = "Validation Problem",
-                    Success = false,
-                    Data = null,
-                    Errors = errors
-
-                };
+                var response = ApiResponse<object>.BadRequest(errors);
                 return new BadRequestObjectResult(response);
 
             };

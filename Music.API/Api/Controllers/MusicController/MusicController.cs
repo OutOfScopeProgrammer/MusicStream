@@ -23,9 +23,12 @@ namespace Music.API.Api.Controllers.MusicController
 
             var musics = await musicRepository.GetMusics(cancellationToken);
             if (musics is null)
-                return NotFound();
+                return NotFound(ApiResponse<List<MusicDto>>.NotFound("musics not found."));
             var dtos = MusicDtoMapper.ToMusicDto(musics, linkGenerator, HttpContext);
-            return Ok(dtos);
+
+            var respone = ApiResponse<List<MusicDto>>.Ok(dtos);
+
+            return Ok(respone);
         }
         [HttpGet("{musicId:guid}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -36,7 +39,7 @@ namespace Music.API.Api.Controllers.MusicController
         {
             var music = await musicRepository.GetMusicById(musicId, true, cancellationToken);
             if (music is null)
-                return NotFound();
+                return NotFound(ApiResponse<MusicDto>.NotFound($"music with {musicId} does not exist"));
             var dto = MusicDtoMapper.ToMusicDto(music, linkGenerator, HttpContext);
             return Ok(dto);
 
@@ -47,6 +50,8 @@ namespace Music.API.Api.Controllers.MusicController
         [Consumes("multipart/form-data")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+
         [EndpointDescription("ایجاد و ارسال موسیقی برای پردازش")]
         [EndpointSummary("Create music")]
         public async Task<IActionResult> CreateMusic([FromForm] CreateMusicDto dto, CancellationToken cancellationToken)
@@ -62,8 +67,8 @@ namespace Music.API.Api.Controllers.MusicController
              fileName, dto.SingerId, cancellationToken);
 
             return response.IsSuccess
-            ? Ok("File is in processing queue")
-            : NotFound(response.Error);
+            ? Ok(ApiResponse<IActionResult>.Ok())
+            : NotFound(ApiResponse<IActionResult>.NotFound(response.Error));
         }
     }
 }

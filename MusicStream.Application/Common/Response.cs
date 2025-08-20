@@ -4,6 +4,7 @@ namespace MusicStream.Application.Common;
 
 public class Response
 {
+    [MemberNotNullWhen(false, nameof(Error))]
     public bool IsSuccess { get; set; }
     public string? Error { get; set; } = string.Empty;
     private Response(bool isSucess, string? errors)

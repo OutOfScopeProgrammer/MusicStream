@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Music.API.Helper;
@@ -12,13 +13,17 @@ namespace Music.API.Api.Controllers.IdentityController
     {
 
         [HttpPost("sign-up")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [EndpointSummary("Sign Up")]
         public async Task<IActionResult> SignUp([FromBody] IdentityDto dto)
         {
             var result = await authService.CreateUserWithFreeSubscription(dto.PhoneNumber, dto.Password);
             if (!result.IsSuccess)
-                return BadRequest(result.Error);
+                return BadRequest(ApiResponse<IActionResult>.BadRequest(result.Error));
             CookieHelper.SetCookie(HttpContext, result.Data.AccessToken, options.Value.ExpirationInMinutes);
-            return Created();
+            // TODO: return refreshToken
+            return Ok(ApiResponse<IActionResult>.Ok());
         }
     }
 }
