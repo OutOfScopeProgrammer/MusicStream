@@ -3,7 +3,9 @@ using System.Text;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
+using Music.API.Helper;
 using Music.API.Interfaces;
 using MusicStream.Infrastructure.Auth;
 
@@ -13,7 +15,27 @@ public static class ServiceCollectionExtension
 {
     public static void AddApiLayer(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddControllers();
+        services.AddControllers().ConfigureApiBehaviorOptions(option =>
+        {
+            option.InvalidModelStateResponseFactory = context =>
+            {
+                var errors = context.ModelState.Where(x => x.Value?.Errors.Count > 0)
+            .ToDictionary(
+                kvp => kvp.Key,
+                kvp => kvp.Value?.Errors.Select(e => e.ErrorMessage).ToList());
+                var response = new ApiResponse<object>()
+                {
+                    StatusCode = StatusCodes.Status400BadRequest,
+                    Message = "Validation Problem",
+                    Success = false,
+                    Data = null,
+                    Errors = errors
+
+                };
+                return new BadRequestObjectResult(response);
+
+            };
+        });
         services.AddAuth(configuration);
         services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly())
         .AddFluentValidationAutoValidation();
