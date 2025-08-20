@@ -12,6 +12,7 @@ public class User : Auditable
 
     [JsonIgnore]
     public Subscription? Subscription { get; set; }
+    public RefreshToken? RefreshToken { get; set; }
 
     public void SetSubscription(Subscription subscription)
     {
