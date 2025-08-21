@@ -14,9 +14,10 @@ public class Playlist : Auditable
 
     public void AddMusic(Music music) => Musics.Add(music);
     public void UpdateTitle(string title) => Title = title;
-    public static Playlist Create(Subscription subscription)
+    public static Playlist Create(Subscription subscription, string title)
         => new()
         {
+            Title = title,
             Subscription = subscription,
             SubscriptionId = subscription.Id
         };

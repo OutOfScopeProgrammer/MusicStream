@@ -7,13 +7,13 @@ namespace MusicStream.Application.Services;
 public class MusicService(ISubscriptionRepository subRepository, IPlayListRepository playListRepository)
 {
     // TODO: fix error messages
-    public async Task<Response> CreatePlaylist(Guid userId, CancellationToken token)
+    public async Task<Response> CreatePlaylist(Guid userId, CancellationToken token, string title)
     {
         var sub = await subRepository.GetSubscriptionByUserId(userId, false, token);
         if (sub is null)
             return Response.Failed(ErrorMessages.NotFound(nameof(sub)));
 
-        var playList = Playlist.Create(sub);
+        var playList = Playlist.Create(sub, title);
         var msg = sub.TryAddPlaylist(playList);
         if (msg is not null)
             return Response.Failed(msg);
@@ -30,10 +30,14 @@ public class MusicService(ISubscriptionRepository subRepository, IPlayListReposi
         await playListRepository.SaveChangesAsync(token);
         return Response.Succeed();
     }
-    public async Task UpdatePlaylist()
+    public async Task<Response> UpdatePlaylist(string title, Guid playlistId, CancellationToken token)
     {
-        throw new NotImplementedException();
-
+        var playList = await playListRepository.GetPlaylistById(playlistId, false, token);
+        if (playList is null)
+            return Response.Failed(ErrorMessages.NotFound(nameof(playList)));
+        playList.UpdateTitle(title);
+        await playListRepository.SaveChangesAsync(token);
+        return Response.Succeed();
     }
 
     public async Task AddMusicToPlaylist()
