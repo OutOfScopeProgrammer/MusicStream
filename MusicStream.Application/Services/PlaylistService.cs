@@ -25,8 +25,8 @@ IMusicRepository musicRepository)
         var playList = Playlist.Create(sub, title);
         var msg = sub.TryAddPlaylist(playList);
 
-        if (msg is not null)
-            return Response.Failed(msg);
+        if (!msg)
+            return Response.Failed("You reach the limit");
 
         await subRepository.SaveChangesAsync(token);
         return Response.Succeed();
