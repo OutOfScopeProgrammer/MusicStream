@@ -9,17 +9,19 @@ public class Music : Auditable
     public string Description { get; set; } = string.Empty;
     public string StreamUrl { get; set; } = string.Empty;
     public List<Playlist> Playlist { get; set; } = [];
+    // public bool IsAvailable { get; set; }
 
     public Singer? Singer { get; set; } = new();
     public Guid? SingerId { get; set; }
 
-    public static Music Create(string title, string description, Singer singer)
+    public static Music Create(string title, string description, Guid singerId, string streamUrl)
         => new()
         {
             Title = title,
             Description = description,
-            Singer = singer,
-            SingerId = singer.Id
+            SingerId = singerId,
+            // IsAvailable = isAvailable,
+            StreamUrl = streamUrl
         };
 
 }

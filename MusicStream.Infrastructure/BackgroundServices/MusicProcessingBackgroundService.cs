@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using MusicStream.Application.Interfaces;
+using MusicStream.Domain.Entities;
 using MusicStream.Infrastructure.Persistence.Postgres;
 using MusicStream.Infrastructure.Processors;
 
@@ -21,14 +22,14 @@ IMusicChannel channel,
 
             if (await channel.WaitToReadAsync())
             {
-                var dto = await channel.ReadAsync();
+                var msg = await channel.ReadAsync();
 
                 Console.WriteLine("Processing....");
 
-                var outputFolder = Path.Combine(ROOTFOLDER, dto.FileName);
+                var outputFolder = Path.Combine(ROOTFOLDER, msg.FileName);
                 Directory.CreateDirectory(outputFolder);
 
-                await musicProcessor.ConvertForDash(dto.TempFilePath, outputFolder);
+                await musicProcessor.ConvertForDash(msg.TempFilePath, outputFolder);
 
                 var files = GetFiles(outputFolder);
                 Console.WriteLine("Sending to minio....");
@@ -36,8 +37,8 @@ IMusicChannel channel,
                 await musicStorage.BatchUploadToMinio(files, ROOTFOLDER);
 
                 await CleanUpDisk();
-                var streamUrl = $"{dto.FileName}/manifest.mpd";
-                await UpdateMusicStreamUrl(dto.musciEntityId, streamUrl);
+                var streamUrl = $"{msg.FileName}/manifest.mpd";
+                await SaveMusic(msg.Title, msg.Description, streamUrl, msg.SingerId);
 
             }
 
@@ -64,13 +65,13 @@ IMusicChannel channel,
 
 
 
-    private async Task UpdateMusicStreamUrl(Guid musicId, string streamUrl)
+    private async Task SaveMusic(string title, string description, string streamUrl, Guid singerId)
     {
         using var scope = scopeFactory.CreateScope();
         var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-        await dbContext.Musics.Where(m => m.Id == musicId)
-        .ExecuteUpdateAsync(set =>
-        set.SetProperty(m => m.StreamUrl, m => streamUrl));
+        var music = Music.Create(title, description, singerId, streamUrl);
+        dbContext.Add(music);
+        await dbContext.SaveChangesAsync();
     }
 
 

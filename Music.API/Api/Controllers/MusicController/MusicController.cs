@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Music.API.Helper;
+using MusicStream.Application.Interfaces;
 using MusicStream.Application.Interfaces.Repositories;
 using MusicStream.Application.Services;
 
@@ -8,8 +9,9 @@ namespace Music.API.Api.Controllers.MusicController
     [ApiController]
     [Route("api/v1/[controller]")]
     public class MusicController
-    (IWebHostEnvironment env, MusicService musicService,
-    IMusicRepository musicRepository, LinkGenerator linkGenerator) : ControllerBase
+    (IWebHostEnvironment env, IMusicChannel musicChannel,
+    IMusicRepository musicRepository, LinkGenerator linkGenerator,
+    ISingerRepository singerRepository) : ControllerBase
     {
 
         [HttpGet()]
@@ -56,19 +58,21 @@ namespace Music.API.Api.Controllers.MusicController
         [EndpointSummary("Create music")]
         public async Task<IActionResult> CreateMusic([FromForm] CreateMusicDto dto, CancellationToken cancellationToken)
         {
-
+            Guid.TryParse(dto.SingerId, out var id);
+            var singerExist = await singerRepository.GetSingerById(id, true, cancellationToken);
+            if (singerExist is null)
+                return NotFound(ApiResponse<IActionResult>.NotFound($"singer  not found. id: {dto.SingerId}"));
             var (fullPath, fileName, uploadPath) = FileHelper.PrepareFileForSaving(dto.File.FileName, env.WebRootPath);
             Directory.CreateDirectory(uploadPath);
 
             using var fileStream = System.IO.File.Create(fullPath);
-            await dto.File.CopyToAsync(fileStream);
-            var response = await musicService
-            .CreateMusic(dto.Title, dto.Description, fullPath, env.WebRootPath,
-             fileName, dto.SingerId, cancellationToken);
+            await dto.File.CopyToAsync(fileStream, cancellationToken);
 
-            return response.IsSuccess
-            ? Ok(ApiResponse<IActionResult>.Ok())
-            : NotFound(ApiResponse<IActionResult>.NotFound(response.Error));
+            var message = new MusicChannelMessage(fullPath, env.WebRootPath, fileName,
+            dto.Title, dto.Description, id);
+
+            await musicChannel.SendAsync(message);
+            return Ok(ApiResponse<IActionResult>.Ok());
         }
     }
 }

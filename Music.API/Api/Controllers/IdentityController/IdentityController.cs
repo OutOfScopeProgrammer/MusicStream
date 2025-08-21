@@ -10,6 +10,7 @@ namespace Music.API.Api.Controllers.IdentityController
     [ApiController]
     public class IdentityController(IAuthService authService, IOptions<JwtOption> options) : ControllerBase
     {
+        // TODO:Send refreshToken inside cookie and jwt in the response
 
         [HttpPost("sign-up")]
         [ProducesResponseType(StatusCodes.Status200OK)]

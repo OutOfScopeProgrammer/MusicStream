@@ -10,7 +10,8 @@ public static class CookieHelper
             Secure = true,
             HttpOnly = true,
             SameSite = SameSiteMode.Strict,
-            Expires = DateTimeOffset.UtcNow.AddMinutes(expireTimeInMinute)
+            Expires = DateTimeOffset.UtcNow.AddMinutes(expireTimeInMinute),
+
         };
         context.Response.Cookies.Append("access-token", token, option);
     }
