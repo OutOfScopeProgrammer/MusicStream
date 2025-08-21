@@ -7,6 +7,6 @@ public static class ServiceCollectionExtension
 {
     public static void AddApplicationLayer(this IServiceCollection services)
     {
-        services.AddScoped<MusicService>();
+        services.AddScoped<PlaylistService>();
     }
 }
