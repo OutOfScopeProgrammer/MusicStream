@@ -15,4 +15,17 @@ T? Data, object? Errors, object? Meta)
     => new(true, StatusCodes.Status201Created, default, default, default);
 
 }
+public record ApiResponse(bool Success, int StatusCode,
+ object? Errors, object? Meta)
+{
+    public static ApiResponse Ok()
+    => new(true, StatusCodes.Status200OK, null, null);
+    public static ApiResponse NotFound(string message)
+   => new(false, StatusCodes.Status404NotFound, message, default);
+    public static ApiResponse BadRequest(object error)
+    => new(false, StatusCodes.Status400BadRequest, error, default);
+    public static ApiResponse Created()
+    => new(true, StatusCodes.Status201Created, default, default);
+
+}
 
