@@ -8,6 +8,14 @@ public class PlaylistService(ISubscriptionRepository subRepository, IPlayListRep
 IMusicRepository musicRepository)
 {
     // TODO: fix error messages
+    public async Task<Response<Playlist>> GetPlaylistWithMusics(Guid playlistId, CancellationToken cancellationToken)
+    {
+        var playlist = await playListRepository.GetPlaylistWithMusicsByPlaylistId(playlistId, false, cancellationToken);
+        if (playlist is null)
+            return Response<Playlist>.Failed(ErrorMessages.NotFound(nameof(playlist)));
+
+        return Response<Playlist>.Succeed(playlist);
+    }
     public async Task<Response> CreatePlaylist(Guid userId, CancellationToken token, string title)
     {
         var sub = await subRepository.GetSubscriptionByUserId(userId, false, token);
