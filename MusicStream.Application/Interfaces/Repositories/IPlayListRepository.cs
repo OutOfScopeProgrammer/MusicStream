@@ -6,7 +6,7 @@ public interface IPlayListRepository
 {
     Task<Playlist?> GetPlaylistById(Guid playlistId, bool asNoTracking, CancellationToken cancellationToken);
     void AddPlaylist(Playlist playlist);
-    Task<Playlist> GetPlayListWithMusicsByPlaylistId(Guid playlistId, bool asNoTracking, CancellationToken cancellationToken);
+    Task<Playlist?> GetPlaylistWithMusicsByPlaylistId(Guid playlistId, bool asNoTracking, CancellationToken cancellationToken);
     void DeletePlaylist(Playlist playlist);
     Task SaveChangesAsync(CancellationToken cancellationToken);
 

@@ -16,6 +16,7 @@ IMusicRepository musicRepository)
 
         var playList = Playlist.Create(sub, title);
         var msg = sub.TryAddPlaylist(playList);
+
         if (msg is not null)
             return Response.Failed(msg);
 
@@ -29,6 +30,7 @@ IMusicRepository musicRepository)
             return Response.Failed(ErrorMessages.NotFound(nameof(playlist)));
         playListRepository.DeletePlaylist(playlist);
         await playListRepository.SaveChangesAsync(token);
+
         return Response.Succeed();
     }
     public async Task<Response> UpdatePlaylist(string title, Guid playlistId, CancellationToken token)
@@ -36,6 +38,7 @@ IMusicRepository musicRepository)
         var playList = await playListRepository.GetPlaylistById(playlistId, false, token);
         if (playList is null)
             return Response.Failed(ErrorMessages.NotFound(nameof(playList)));
+
         playList.UpdateTitle(title);
         await playListRepository.SaveChangesAsync(token);
         return Response.Succeed();
@@ -52,16 +55,22 @@ IMusicRepository musicRepository)
 
         playList.AddMusic(music);
         await playListRepository.SaveChangesAsync(token);
+
         return Response.Succeed();
     }
     public async Task<Response> RemoveMusicFromPlaylist(Guid musicId, Guid playlistId, CancellationToken token)
     {
-        var playlist = await playListRepository.GetPlayListWithMusicsByPlaylistId(playlistId, false, token);
+        var playlist = await playListRepository.GetPlaylistWithMusicsByPlaylistId(playlistId, false, token);
+        if (playlist is null)
+            return Response.Failed(ErrorMessages.NotFound(nameof(playlist)));
+
         var music = playlist.Musics.FirstOrDefault(m => m.Id == musicId);
         if (music is null)
             return Response.Failed(ErrorMessages.NotFound(nameof(music)));
+
         playlist.RemoveMusic(music);
         await playListRepository.SaveChangesAsync(token);
+
         return Response.Succeed();
     }
 
