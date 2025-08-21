@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Identity;
 using MusicStream.Application.Common;
 using MusicStream.Application.Interfaces.Auth;
 using MusicStream.Application.Interfaces.Repositories;
+using MusicStream.Domain.Common;
 using MusicStream.Domain.Entities;
 using MusicStream.Infrastructure.Repositories;
 

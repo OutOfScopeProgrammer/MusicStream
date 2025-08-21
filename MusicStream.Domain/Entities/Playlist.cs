@@ -13,14 +13,14 @@ public class Playlist : Auditable
     public int MusicLimits { get; set; }
     public Guid SubscriptionId { get; set; }
 
-    public string? TryAddMusic(Music music)
+    public Response TryAddMusic(Music music)
     {
         if (Musics.Count >= MusicLimits)
-            return $"playlist is full.";
+            return Response.Failed("You're play list is full.");
         else
         {
             Musics.Add(music);
-            return string.Empty;
+            return Response.Succeed();
         }
     }
     public void RemoveMusic(Music music) => Musics.Remove(music);

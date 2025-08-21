@@ -32,14 +32,14 @@ public class Subscription : Auditable
         return sub;
     }
 
-    public bool TryAddPlaylist(Playlist playList)
+    public Response TryAddPlaylist(Playlist playList)
     {
         if (Playlists.Count < PlaylistLimit)
         {
             Playlists.Add(playList);
-            return true;
+            return Response.Succeed();
         }
-        return false;
+        return Response.Failed("You reach your playlist limit. upgrade your subscription");
 
     }
 

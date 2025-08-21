@@ -1,4 +1,4 @@
-using MusicStream.Application.Common;
+using MusicStream.Domain.Common;
 
 namespace MusicStream.Application.Interfaces.Auth;
 

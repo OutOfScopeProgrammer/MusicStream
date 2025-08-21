@@ -1,6 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 
-namespace MusicStream.Application.Common;
+namespace MusicStream.Domain.Common;
 
 public class Response
 {
@@ -39,3 +39,4 @@ public class Response<T>
     public static Response<T> Failed(string error) => new(false, error);
 
 }
+

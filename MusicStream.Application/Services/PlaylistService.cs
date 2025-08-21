@@ -1,5 +1,6 @@
 using MusicStream.Application.Common;
 using MusicStream.Application.Interfaces.Repositories;
+using MusicStream.Domain.Common;
 using MusicStream.Domain.Entities;
 
 namespace MusicStream.Application.Services;
