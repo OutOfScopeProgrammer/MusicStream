@@ -34,6 +34,7 @@ public static class ServiceCollectionExtension
         services.AddScoped<ISingerRepository, SingerRepository>();
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<ISubscriptionRepository, SubscriptionRepository>();
+        services.AddScoped<IPlayListRepository, PlaylistRepository>();
         services.AddScoped<RefreshTokenRepository>();
     }
 
