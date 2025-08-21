@@ -1,4 +1,3 @@
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Music.API.Helper;
@@ -16,7 +15,7 @@ namespace Music.API.Api.Controllers.IdentityController
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [EndpointSummary("Sign Up")]
-        public async Task<ActionResult<IdentityResponse>> SignUp([FromBody] IdentityDto dto, CancellationToken cancellationToken)
+        public async Task<ActionResult<ApiResponse<IdentityResponse>>> SignUp([FromBody] IdentityDto dto, CancellationToken cancellationToken)
         {
             var result = await authService.CreateUserWithFreeSubscription(dto.PhoneNumber, dto.Password, cancellationToken);
             if (!result.IsSuccess)
@@ -24,6 +23,20 @@ namespace Music.API.Api.Controllers.IdentityController
             CookieHelper.SetCookie(HttpContext, result.Data.AccessToken, options.Value.ExpirationInMinutes);
             // TODO: return refreshToken
             return Ok(ApiResponse<IdentityResponse>.Ok(new IdentityResponse(result.Data.RefreshToken)));
+        }
+        [HttpPost("sign-in")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [EndpointSummary("Sign In")]
+        public async Task<ActionResult<ApiResponse<IdentityResponse>>> SignIn(IdentityDto dto, CancellationToken cancellationToken)
+        {
+            var result = await authService.LoginWithUserNameAndPassword(dto.PhoneNumber, dto.Password, cancellationToken);
+            if (!result.IsSuccess)
+                return Unauthorized();
+            var response = new IdentityResponse(result.Data.RefreshToken);
+            CookieHelper.SetCookie(HttpContext, result.Data.AccessToken, options.Value.ExpirationInMinutes);
+            return ApiResponse<IdentityResponse>.Ok(response);
+
         }
     }
 }

@@ -13,5 +13,6 @@ T? Data, object? Errors, object? Meta)
     => new(false, StatusCodes.Status400BadRequest, default, error, default);
     public static ApiResponse<T> Created()
     => new(true, StatusCodes.Status201Created, default, default, default);
+
 }
 

@@ -1,5 +1,3 @@
-using Microsoft.AspNetCore.Authentication.BearerToken;
-using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Identity;
 using MusicStream.Application.Common;
 using MusicStream.Application.Interfaces.Auth;
@@ -39,7 +37,7 @@ internal class AuthService
 
     }
 
-    public async Task<Response<AuthResult>> Login(string phoneNumber, string password, CancellationToken cancellationToken)
+    public async Task<Response<AuthResult>> LoginWithUserNameAndPassword(string phoneNumber, string password, CancellationToken cancellationToken)
     {
         var user = await userRepository.GetUserByPhoneNumber(phoneNumber, false, cancellationToken);
         if (user is null)

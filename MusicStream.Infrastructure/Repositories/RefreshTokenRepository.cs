@@ -1,5 +1,4 @@
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Migrations.Operations;
 using MusicStream.Domain.Entities;
 using MusicStream.Infrastructure.Persistence.Postgres;
 
