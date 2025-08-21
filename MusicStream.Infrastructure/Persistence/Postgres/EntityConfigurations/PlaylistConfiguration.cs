@@ -11,5 +11,6 @@ internal class PlaylistConfiguration : IEntityTypeConfiguration<Playlist>
         builder.HasKey(p => p.Id);
         builder.HasOne(p => p.Subscription)
         .WithMany(s => s.Playlists).HasForeignKey(p => p.SubscriptionId);
+        builder.Property(p => p.MusicLimits).HasDefaultValue(10);
     }
 }

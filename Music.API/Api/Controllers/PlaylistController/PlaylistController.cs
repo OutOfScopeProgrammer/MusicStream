@@ -1,4 +1,3 @@
-using System.Net.Sockets;
 using Microsoft.AspNetCore.Mvc;
 using Music.API.Helper;
 using MusicStream.Application.Common;

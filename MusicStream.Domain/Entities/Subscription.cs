@@ -40,9 +40,10 @@ public class Subscription : Auditable
         if (Playlists.Count <= PlaylistLimit)
         {
             Playlists.Add(playList);
-
+            return string.Empty;
         }
-        return $"You already have {PlaylistLimit} playlist. upgrade your subscription for more playlists";
+        else
+            return $"You already have {PlaylistLimit} playlist. upgrade your subscription for more playlists";
     }
 
 

@@ -10,9 +10,19 @@ public class Playlist : Auditable
     public string Title { get; set; } = string.Empty;
     public List<Music> Musics { get; set; } = [];
     public Subscription Subscription { get; set; } = new();
+    public int MusicLimits { get; set; }
     public Guid SubscriptionId { get; set; }
 
-    public void AddMusic(Music music) => Musics.Add(music);
+    public string? TryAddMusic(Music music)
+    {
+        if (Musics.Count >= MusicLimits)
+            return $"playlist is full.";
+        else
+        {
+            Musics.Add(music);
+            return string.Empty;
+        }
+    }
     public void RemoveMusic(Music music) => Musics.Remove(music);
 
     public void UpdateTitle(string title) => Title = title;

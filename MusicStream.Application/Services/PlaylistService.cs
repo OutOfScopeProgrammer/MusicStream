@@ -61,7 +61,7 @@ IMusicRepository musicRepository)
         if (music is null)
             return Response.Failed(ErrorMessages.NotFound(nameof(music)));
 
-        playList.AddMusic(music);
+        playList.TryAddMusic(music);
         await playListRepository.SaveChangesAsync(token);
 
         return Response.Succeed();
