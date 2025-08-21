@@ -69,7 +69,7 @@ IMusicChannel channel,
     {
         using var scope = scopeFactory.CreateScope();
         var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-        var music = Music.Create(title, description, singerId, streamUrl);
+        var music = Music.Create(title, description, false, singerId, streamUrl);
         dbContext.Add(music);
         await dbContext.SaveChangesAsync();
     }
