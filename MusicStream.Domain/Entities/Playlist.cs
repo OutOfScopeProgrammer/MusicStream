@@ -13,6 +13,8 @@ public class Playlist : Auditable
     public Guid SubscriptionId { get; set; }
 
     public void AddMusic(Music music) => Musics.Add(music);
+    public void RemoveMusic(Music music) => Musics.Remove(music);
+
     public void UpdateTitle(string title) => Title = title;
     public static Playlist Create(Subscription subscription, string title)
         => new()

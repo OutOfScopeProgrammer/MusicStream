@@ -54,10 +54,15 @@ IMusicRepository musicRepository)
         await playListRepository.SaveChangesAsync(token);
         return Response.Succeed();
     }
-    public async Task DeleteMusicFromPlaylist()
+    public async Task<Response> RemoveMusicFromPlaylist(Guid musicId, Guid playlistId, CancellationToken token)
     {
-        throw new NotImplementedException();
-
+        var playlist = await playListRepository.GetPlayListWithMusicsByPlaylistId(playlistId, false, token);
+        var music = playlist.Musics.FirstOrDefault(m => m.Id == musicId);
+        if (music is null)
+            return Response.Failed(ErrorMessages.NotFound(nameof(music)));
+        playlist.RemoveMusic(music);
+        await playListRepository.SaveChangesAsync(token);
+        return Response.Succeed();
     }
 
 

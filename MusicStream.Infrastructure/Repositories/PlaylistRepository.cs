@@ -21,12 +21,12 @@ internal class PlaylistRepository(AppDbContext dbContext) : IPlayListRepository
 
 
 
-    public async Task<List<Music>> GetMusicsByPlaylistId(Guid playlistId, bool asNoTracking, CancellationToken cancellationToken)
+    public async Task<Playlist?> GetPlayListWithMusicsByPlaylistId(Guid playlistId, bool asNoTracking, CancellationToken cancellationToken)
     {
-        var query = dbContext.Musics.AsQueryable();
+        var query = dbContext.Playlists.AsQueryable();
         if (asNoTracking)
             query = query.AsNoTracking();
-        var musics = await query.Where(m => m.Playlist.Any(p => p.Id == playlistId)).ToListAsync(cancellationToken);
+        var musics = await query.Include(p => p.Musics).SingleOrDefaultAsync(p => p.Id == playlistId, cancellationToken);
 
         return musics;
     }
