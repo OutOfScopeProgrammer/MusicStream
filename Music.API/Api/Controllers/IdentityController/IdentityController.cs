@@ -38,5 +38,18 @@ namespace Music.API.Api.Controllers.IdentityController
             return ApiResponse<IdentityResponse>.Ok(response);
 
         }
+        [HttpPost("refresh-token")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [EndpointSummary("Refresh Token")]
+        public async Task<ActionResult<ApiResponse<IdentityResponse>>> SignInRefreshToken(RefreshTokenDto dto, CancellationToken cancellationToken)
+        {
+            var result = await authService.LoginUsingRefreshToken(dto.RefreshToken, cancellationToken);
+            if (!result.IsSuccess)
+                return Unauthorized();
+            var response = new IdentityResponse(result.Data.RefreshToken);
+            CookieHelper.SetCookie(HttpContext, result.Data.AccessToken, options.Value.ExpirationInMinutes);
+            return ApiResponse<IdentityResponse>.Ok(response);
+        }
     }
 }
