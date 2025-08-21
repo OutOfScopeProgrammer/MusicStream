@@ -33,6 +33,7 @@ public static class ServiceCollectionExtension
         services.AddScoped<IMusicRepository, MusicRepository>();
         services.AddScoped<ISingerRepository, SingerRepository>();
         services.AddScoped<IUserRepository, UserRepository>();
+        services.AddScoped<ISubscriptionRepository, SubscriptionRepository>();
         services.AddScoped<RefreshTokenRepository>();
     }
 

@@ -12,4 +12,10 @@ public class Playlist : Auditable
     public Guid SubscriptionId { get; set; }
 
     public void AddMusic(Music music) => Musics.Add(music);
+    public static Playlist Create(Subscription subscription)
+        => new()
+        {
+            Subscription = subscription,
+            SubscriptionId = subscription.Id
+        };
 }

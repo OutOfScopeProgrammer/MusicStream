@@ -9,14 +9,13 @@ internal class SubscriptionRepository(AppDbContext dbContext) : ISubscriptionRep
 {
 
 
-    public async Task<List<Playlist>> GetPlayistsByUserId(Guid userId, bool asNoTracking, CancellationToken cancellationToken)
+    public async Task<Subscription?> GetSubscriptionByUserId(Guid userId, bool asNoTracking, CancellationToken cancellationToken)
     {
-        var query = dbContext.Playlists.AsQueryable();
+        var query = dbContext.Subscriptions.AsQueryable();
         if (asNoTracking)
             query = query.AsNoTracking();
-        var playlists = await query.Include(p => p.Subscription)
-        .Where(p => p.Subscription.UserId == userId).ToListAsync(cancellationToken);
-        return playlists;
+        var sub = await query.Include(s => s.Playlists).SingleOrDefaultAsync(s => s.UserId == userId);
+        return sub;
     }
     public void AddSubscription(Subscription subscription)
         => dbContext.Subscriptions.Add(subscription);

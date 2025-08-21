@@ -35,14 +35,14 @@ public class Subscription : Auditable
 
 
 
-    public bool TryAddPlaylist(Playlist playList)
+    public string? TryAddPlaylist(Playlist playList)
     {
         if (Playlists.Count <= PlaylistLimit)
         {
             Playlists.Add(playList);
-            return true;
+
         }
-        return false;
+        return $"You already have {PlaylistLimit} playlist. upgrade your subscription for more playlists";
     }
 
 

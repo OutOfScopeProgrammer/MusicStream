@@ -6,6 +6,7 @@ public static class ErrorMessages
     {
         return $"{nameof(obj)} is not found.";
     }
+
     public static string DuplicatePhoneNumber()
     {
         return $"phoneNumber is duplicated.";

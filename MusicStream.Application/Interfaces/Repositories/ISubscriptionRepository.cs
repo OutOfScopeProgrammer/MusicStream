@@ -7,7 +7,7 @@ public interface ISubscriptionRepository
 
     Task<Subscription?> GetSubscriptionById(Guid subscriptionId, bool asNoTracking, CancellationToken cancellationToken);
     void AddSubscription(Subscription subscription);
-    Task<List<Playlist>> GetPlayistsByUserId(Guid userId, bool asNoTracking, CancellationToken cancellationToken);
+    Task<Subscription?> GetSubscriptionByUserId(Guid userId, bool asNoTracking, CancellationToken cancellationToken);
     Task SaveChangesAsync(CancellationToken cancellationToken);
 
 

@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Mvc;
 using Music.API.Helper;
 using MusicStream.Application.Interfaces;
 using MusicStream.Application.Interfaces.Repositories;
-using MusicStream.Application.Services;
 
 namespace Music.API.Api.Controllers.MusicController
 {
