@@ -32,4 +32,9 @@ internal class PlaylistRepository(AppDbContext dbContext) : IPlayListRepository
     }
     public async Task SaveChangesAsync(CancellationToken cancellationToken)
     => await dbContext.SaveChangesAsync(cancellationToken);
+
+    public void DeletePlaylist(Playlist playlist)
+        => dbContext.Playlists.Remove(playlist);
+
+
 }

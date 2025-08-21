@@ -4,7 +4,7 @@ using MusicStream.Domain.Entities;
 
 namespace MusicStream.Application.Services;
 
-public class MusicService(ISubscriptionRepository subRepository)
+public class MusicService(ISubscriptionRepository subRepository, IPlayListRepository playListRepository)
 {
     // TODO: fix error messages
     public async Task<Response> CreatePlaylist(Guid userId, CancellationToken token)
@@ -21,9 +21,14 @@ public class MusicService(ISubscriptionRepository subRepository)
         await subRepository.SaveChangesAsync(token);
         return Response.Succeed();
     }
-    public async Task DeletePlaylist()
+    public async Task<Response> DeletePlaylist(Guid userId, Guid playListId, CancellationToken token)
     {
-        throw new NotImplementedException();
+        var playlist = await playListRepository.GetPlaylistById(playListId, false, token);
+        if (playlist is null)
+            return Response.Failed(ErrorMessages.NotFound(nameof(playlist)));
+        playListRepository.DeletePlaylist(playlist);
+        await playListRepository.SaveChangesAsync(token);
+        return Response.Succeed();
     }
     public async Task UpdatePlaylist()
     {
