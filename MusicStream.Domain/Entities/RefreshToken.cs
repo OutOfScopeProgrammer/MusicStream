@@ -20,4 +20,12 @@ public class RefreshToken
         User = user;
         UserId = user.Id;
     }
+
+    public bool IsValid()
+    {
+        if (ExpirationTime > DateTime.UtcNow)
+            return false;
+
+        return true;
+    }
 }

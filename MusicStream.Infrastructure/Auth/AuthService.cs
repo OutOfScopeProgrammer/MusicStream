@@ -58,6 +58,11 @@ internal class AuthService
         var refreshToken = await tokenRepository.GetRefreshTokenByToken(token);
         if (refreshToken is null)
             return Response<AuthResult>.Failed(ErrorMessages.RefreshTokenError());
+
+        else if (!refreshToken.IsValid())
+            return Response<AuthResult>.Failed(ErrorMessages.RefreshTokenError());
+
+
         var newRefreshToken = tokenGenerator.RefreshToken();
         refreshToken.Token = newRefreshToken;
 
