@@ -24,10 +24,10 @@ IMusicRepository musicRepository)
             return Response.Failed(ErrorMessages.NotFound(nameof(sub)));
 
         var playList = Playlist.Create(sub, title);
-        var msg = sub.TryAddPlaylist(playList);
+        var response = sub.TryAddPlaylist(playList);
 
-        if (!msg)
-            return Response.Failed("You reach the limit");
+        if (!response.IsSuccess)
+            return Response.Failed(response.Error);
 
         await subRepository.SaveChangesAsync(token);
         return Response.Succeed();
@@ -58,11 +58,15 @@ IMusicRepository musicRepository)
         var playList = await playListRepository.GetPlaylistById(playlistId, false, token);
         if (playList is null)
             return Response.Failed(ErrorMessages.NotFound(nameof(playList)));
+
         var music = await musicRepository.GetMusicById(musicId, false, token);
         if (music is null)
             return Response.Failed(ErrorMessages.NotFound(nameof(music)));
 
-        playList.TryAddMusic(music);
+        var response = playList.TryAddMusic(music);
+        if (!response.IsSuccess)
+            return Response.Failed(response.Error);
+
         await playListRepository.SaveChangesAsync(token);
 
         return Response.Succeed();
