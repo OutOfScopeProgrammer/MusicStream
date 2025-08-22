@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using MusicStream.Application.Interfaces;
@@ -35,9 +36,9 @@ IMusicChannel channel,
 
                 await musicStorage.BatchUploadToMinio(files, ROOTFOLDER);
 
-                await CleanUpDisk();
+                // await CleanUpDisk();
                 var streamUrl = $"{msg.FileName}/manifest.mpd";
-                // await SaveMusic(msg.Title, msg.Description, streamUrl);
+                await SaveMusic(metaData, streamUrl);
 
             }
 
@@ -64,12 +65,12 @@ IMusicChannel channel,
 
 
 
-    private async Task SaveMusic(string title, string description, string streamUrl)
+    private async Task SaveMusic(FFProbeResult metaData, string streamUrl)
     {
         using var scope = scopeFactory.CreateScope();
         var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-
-        var music = Music.Create(title, description, false, streamUrl);
+        (string title, string artist, string duration, string date, string genre) = ExtractMetaData(metaData);
+        var music = Music.Create(title, artist, date, duration, genre, true, streamUrl);
         dbContext.Add(music);
         await dbContext.SaveChangesAsync();
     }
@@ -92,6 +93,8 @@ IMusicChannel channel,
                 artist = str.Value;
             if (str.Key == "date")
                 date = str.Value;
+            if (str.Key == "genre")
+                genre = str.Value;
         }
         return (title, artist, duration, date, genre);
     }

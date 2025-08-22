@@ -21,7 +21,7 @@ namespace MusicStream.Infrastructure.Processors
         public async Task<FFProbeResult?> ConvertForDash(string inputFile, string outputFolder)
         {
             var sb = new StringBuilder();
-            sb.Append($"-i {inputFile} ")
+            sb.Append($"-i \"{inputFile}\" ")
             .Append($"-filter_complex ") // need space at the end
             .Append($"\"")
             .Append($"[0:a]aresample=44100[a1];")
@@ -33,7 +33,7 @@ namespace MusicStream.Infrastructure.Processors
             .Append($"-map \"[a3]\" -c:a aac -b:a 320k ")
             .Append($"-f dash ")
             .Append($"-seg_duration 5 ")
-            .Append($"{outputFolder}/manifest.mpd");
+            .Append($"\"{outputFolder}\"/manifest.mpd");
             string FFMPEGARGS = sb.ToString();
             var metadata = await RunFFProble(inputFile);
 

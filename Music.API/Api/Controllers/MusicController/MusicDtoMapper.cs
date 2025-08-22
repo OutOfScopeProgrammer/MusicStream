@@ -12,7 +12,7 @@ public static class MusicDtoMapper
          new { musicId = parts[0], fileName = parts[1] });
         if (streamUrl is null)
             throw new Exception("generating streamUrl failed");
-        var dto = new MusicDto(music.Title, music.Description, streamUrl);
+        var dto = new MusicDto(music.Title, music.Artist, streamUrl);
         ;
         return dto;
     }

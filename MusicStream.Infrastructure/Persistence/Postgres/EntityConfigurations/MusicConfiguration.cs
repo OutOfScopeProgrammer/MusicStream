@@ -10,7 +10,11 @@ internal class MusicConfiguration : IEntityTypeConfiguration<Music>
     {
         builder.HasKey(m => m.Id);
         builder.Property(m => m.Title).HasMaxLength(50).IsRequired();
-        builder.Property(m => m.Description).HasMaxLength(150);
+        builder.Property(m => m.Artist).HasMaxLength(100);
+        builder.Property(m => m.Date).HasMaxLength(15);
+        builder.Property(m => m.Duration).HasMaxLength(20);
+        builder.Property(m => m.Genre).HasMaxLength(50);
+
         builder.HasMany(m => m.Playlist)
         .WithMany(p => p.Musics);
 
