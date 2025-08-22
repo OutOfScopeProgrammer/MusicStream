@@ -13,13 +13,13 @@ internal class TokenGenerator(IOptions<JwtOption> jwtOption) : ITokenGenerator
 {
     private readonly JwtOption option = jwtOption.Value;
 
-    public string JwtToken(User user)
+    public string JwtToken(Guid userId, Guid subscriptionId)
     {
         var claims = new List<Claim>
         {
             new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-            new(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
-            new("subscription", user.SubscriptionId.ToString()),
+            new(JwtRegisteredClaimNames.Sub, userId.ToString()),
+            new("subscription", subscriptionId.ToString()),
 
         };
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(option.Secret));

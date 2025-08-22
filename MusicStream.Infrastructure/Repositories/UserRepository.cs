@@ -19,7 +19,7 @@ internal class UserRepository(AppDbContext dbContext) : IUserRepository
         var query = dbContext.Users.AsQueryable();
         if (asNoTracking)
             query = query.AsNoTracking();
-        return query.SingleOrDefaultAsync(u => u.PhoneNumber == phoneNumber, cancellationToken);
+        return query.Include(u => u.Subscription).SingleOrDefaultAsync(u => u.PhoneNumber == phoneNumber, cancellationToken);
     }
 
     public void AddUser(User user)

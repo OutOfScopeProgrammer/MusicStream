@@ -14,6 +14,7 @@ internal class RefreshTokenRepository(AppDbContext dbContext)
 
     public async Task<RefreshToken?> GetRefreshTokenByToken(string token)
     => await dbContext.RefreshTokens.Include(r => r.User)
+        .ThenInclude(u => u!.Subscription)
                 .SingleOrDefaultAsync(r => r.Token == token);
 
 
