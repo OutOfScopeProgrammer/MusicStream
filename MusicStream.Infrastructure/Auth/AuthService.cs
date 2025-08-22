@@ -33,7 +33,7 @@ internal class AuthService
         tokenRepository.AddRefreshToken(refreshToken);
         await userRepository.SaveChangesAsync(cancellationToken);
 
-        var accessToken = tokenGenerator.JwtToken(user.Id);
+        var accessToken = tokenGenerator.JwtToken(user);
         return Response<AuthResult>.Succeed(new AuthResult(accessToken, refreshToken.Token));
 
     }
@@ -49,7 +49,7 @@ internal class AuthService
 
         var newRefreshToken = tokenGenerator.RefreshToken();
         await tokenRepository.UpdateUserRefreshTokenByUserId(user.Id, newRefreshToken);
-        var accessToken = tokenGenerator.JwtToken(user.Id);
+        var accessToken = tokenGenerator.JwtToken(user);
         return Response<AuthResult>.Succeed(new AuthResult(accessToken, newRefreshToken));
     }
 
@@ -69,7 +69,7 @@ internal class AuthService
 
         await tokenRepository.SaveChangesAsync(cancellationToken);
 
-        var accessToken = tokenGenerator.JwtToken(refreshToken.UserId);
+        var accessToken = tokenGenerator.JwtToken(refreshToken.User);
         return Response<AuthResult>.Succeed(new AuthResult(accessToken, newRefreshToken));
 
     }
