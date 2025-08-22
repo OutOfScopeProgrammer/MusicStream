@@ -56,16 +56,6 @@ public static class ServiceCollectionExtension
         })
         .AddJwtBearer(option =>
         {
-            option.Events = new JwtBearerEvents
-            {
-                OnMessageReceived = context =>
-                {
-
-                    var token = context.HttpContext.Request.Cookies["access_token"];
-                    context.Token = token;
-                    return Task.CompletedTask;
-                }
-            };
 
             var jwtOption = configuration.GetSection(nameof(JwtOption)).Get<JwtOption>()
              ?? throw new Exception("Something is wrong with Jwt token setting");
