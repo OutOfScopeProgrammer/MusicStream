@@ -13,6 +13,8 @@ T? Data, object? Errors, object? Meta)
     => new(false, StatusCodes.Status400BadRequest, default, error, default);
     public static ApiResponse<T> Created()
     => new(true, StatusCodes.Status201Created, default, default, default);
+    public static ApiResponse<T> NoContent()
+    => new(true, StatusCodes.Status204NoContent, default, default, default);
 
 }
 public record ApiResponse(bool Success, int StatusCode,
@@ -26,6 +28,8 @@ public record ApiResponse(bool Success, int StatusCode,
     => new(false, StatusCodes.Status400BadRequest, error, default);
     public static ApiResponse Created()
     => new(true, StatusCodes.Status201Created, default, default);
+    public static ApiResponse NoContent()
+   => new(true, StatusCodes.Status204NoContent, default, default);
 
 }
 

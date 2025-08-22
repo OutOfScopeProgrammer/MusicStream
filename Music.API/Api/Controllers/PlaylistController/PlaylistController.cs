@@ -1,3 +1,4 @@
+using System.Data;
 using Microsoft.AspNetCore.Mvc;
 using Music.API.Helper;
 using MusicStream.Application.Common;
@@ -25,6 +26,7 @@ namespace Music.API.Api.Controllers.PlaylistController
             return ApiResponse<PlaylistDto>.Ok(dto);
         }
 
+
         [HttpPost("{playlistId:guid}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -37,9 +39,10 @@ namespace Music.API.Api.Controllers.PlaylistController
                 return Ok(ApiResponse.NotFound(response.Error));
             return ApiResponse.Ok();
             // TODO: make it in a way that can return badrequest for domain error to
-
         }
-        [HttpPost("{playlistId:guid}/{musicId:guid}")]
+
+
+        [HttpDelete("{playlistId:guid}/{musicId:guid}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [EndpointSummary("Remove music to playlist")]
@@ -50,5 +53,35 @@ namespace Music.API.Api.Controllers.PlaylistController
                 return Ok(ApiResponse.NotFound(response.Error));
             return ApiResponse.Ok();
         }
+
+
+        [HttpDelete("{playlistId:guid}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [EndpointSummary("Remove music to playlist")]
+        public async Task<ActionResult<ApiResponse<string>>> UpdatePlaylist(Guid playlistId, UpdatePlaylistDto dto, CancellationToken token)
+        {
+            //  Get user id from token or subscription
+            var response = await playlistService.UpdatePlaylist(dto.Title, playlistId, token);
+            if (!response.IsSuccess)
+                return BadRequest(ApiResponse.BadRequest(response.Error));
+            return NoContent();
+        }
+
+
+        [HttpPut("{playlistId:guid}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [EndpointSummary("Remove music to playlist")]
+        public async Task<ActionResult<ApiResponse>> RemovePlaylist(Guid playlistId, CancellationToken token)
+        {
+            //  Get user id from token or subscription
+            var response = await playlistService.DeletePlaylist(Guid.NewGuid(), playlistId, token);
+            if (!response.IsSuccess)
+                return BadRequest(ApiResponse.BadRequest(response.Error));
+            return NoContent();
+        }
     }
 }
+
+
