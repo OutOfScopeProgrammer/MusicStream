@@ -52,14 +52,14 @@ namespace Music.API.Api.Controllers.MusicController
 
         [EndpointDescription("ایجاد و ارسال موسیقی برای پردازش")]
         [EndpointSummary("Create music")]
-        public async Task<IActionResult> CreateMusic([FromForm] CreateMusicDto dto, CancellationToken cancellationToken)
+        public async Task<IActionResult> CreateMusic(IFormFile file, CancellationToken cancellationToken)
         {
 
-            var (fullPath, fileName, uploadPath) = FileHelper.PrepareFileForSaving(dto.File.FileName, env.WebRootPath);
+            var (fullPath, fileName, uploadPath) = FileHelper.PrepareFileForSaving(file.FileName, env.WebRootPath);
             Directory.CreateDirectory(uploadPath);
 
             using var fileStream = System.IO.File.Create(fullPath);
-            await dto.File.CopyToAsync(fileStream, cancellationToken);
+            await file.CopyToAsync(fileStream, cancellationToken);
 
             var message = new MusicChannelMessage(fullPath, env.WebRootPath, fileName);
 

@@ -1,14 +1,24 @@
 using System.Diagnostics;
 using System.Text;
+using System.Text.Json;
 
 namespace MusicStream.Infrastructure.Processors
 {
+
+    internal record FFprobeFormat(string FileName, string Duration, Dictionary<string, string> Tags);
+
+    internal record StreamInfo(string CodecName, string CodecType, string SampleRate, int Channels, string BitRate, string Duration);
+    internal record FFProbeResult(List<StreamInfo> Streams, FFprobeFormat Format);
+
+
+
+
     internal class MusicProcessor
     {
         private const string FFMPEGPATH = @"C:\Users\rezaj\AppData\Local\Microsoft\WinGet\Packages\Gyan.FFmpeg.Essentials_Microsoft.Winget.Source_8wekyb3d8bbwe\ffmpeg-7.1.1-essentials_build\bin\ffmpeg.exe";
+        private const string FFPROBE = @"C:\Users\rezaj\AppData\Local\Microsoft\WinGet\Packages\Gyan.FFmpeg.Essentials_Microsoft.Winget.Source_8wekyb3d8bbwe\ffmpeg-7.1.1-essentials_build\bin\ffprobe.exe";
 
-
-        public async Task ConvertForDash(string inputFile, string outputFolder)
+        public async Task<FFProbeResult?> ConvertForDash(string inputFile, string outputFolder)
         {
             var sb = new StringBuilder();
             sb.Append($"-i {inputFile} ")
@@ -24,10 +34,11 @@ namespace MusicStream.Infrastructure.Processors
             .Append($"-f dash ")
             .Append($"-seg_duration 5 ")
             .Append($"{outputFolder}/manifest.mpd");
-            var args = sb.ToString();
+            string FFMPEGARGS = sb.ToString();
+            var metadata = await RunFFProble(inputFile);
 
-            await RunFFmpeg(args);
-
+            await RunFFmpeg(FFMPEGARGS);
+            return metadata;
         }
 
 
@@ -60,6 +71,45 @@ namespace MusicStream.Infrastructure.Processors
                 Console.WriteLine(stdout);
                 throw new Exception($"FFmpeg exited with code {process.ExitCode}");
             }
+        }
+
+        private async Task<FFProbeResult?> RunFFProble(string inputFile)
+        {
+            var args = $"-v quiet -print_format json -show_format -show_streams \"{inputFile}\"";
+            using var process = new Process
+            {
+                StartInfo = new ProcessStartInfo
+                {
+                    FileName = FFPROBE,
+                    Arguments = args,
+                    RedirectStandardError = true,
+                    RedirectStandardOutput = true,
+                    UseShellExecute = false,
+                    CreateNoWindow = true
+                }
+            };
+
+            process.Start();
+
+            var stderr = process.StandardError.ReadToEndAsync();
+            var stdout = process.StandardOutput.ReadToEndAsync();
+
+            await process.WaitForExitAsync();
+            string output = await stdout;
+            string error = await stderr;
+
+
+            if (process.ExitCode != 0)
+            {
+                Console.WriteLine("FFProbe Error:");
+                Console.WriteLine(stderr);
+                Console.WriteLine(stdout);
+                throw new Exception($"FFProbe exited with code {process.ExitCode}");
+            }
+
+            var metaData = JsonSerializer.Deserialize<FFProbeResult>(output,
+            new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+            return metaData;
         }
     }
 }
