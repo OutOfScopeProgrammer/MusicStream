@@ -18,13 +18,7 @@ internal class RefreshTokenRepository(AppDbContext dbContext)
                 .SingleOrDefaultAsync(r => r.Token == token);
 
 
-    public async Task<bool> UpdateUserRefreshTokenByUserId(Guid userId, string token)
-    {
-        return await dbContext.RefreshTokens
-        .Where(r => r.UserId == userId)
-        .ExecuteUpdateAsync
-        (r => r.SetProperty(r => r.Token, m => token)) > 0;
-    }
+
 
     public async Task SaveChangesAsync(CancellationToken cancellationToken)
     => await dbContext.SaveChangesAsync(cancellationToken);

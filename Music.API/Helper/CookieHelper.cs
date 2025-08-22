@@ -3,17 +3,17 @@ namespace Music.API.Helper;
 public static class CookieHelper
 {
 
-    public static void SetCookie(HttpContext context, string token, int expireTimeInMinute, LinkGenerator linkGenerator)
+    public static void SetCookie(HttpContext context, string token, DateTime exipirationTime, LinkGenerator linkGenerator)
     {
         var refreshEndpoint = linkGenerator.GetUriByName(context, "refresh-token-endpoint");
-        var uri = new Uri(refreshEndpoint);
+        var uri = new Uri(refreshEndpoint!);
 
         var option = new CookieOptions
         {
             Secure = true,
             HttpOnly = true,
             SameSite = SameSiteMode.Strict,
-            Expires = DateTimeOffset.UtcNow.AddMinutes(expireTimeInMinute),
+            Expires = exipirationTime,
             Path = uri.AbsolutePath
         };
         context.Response.Cookies.Append("refresh-token", token, option);

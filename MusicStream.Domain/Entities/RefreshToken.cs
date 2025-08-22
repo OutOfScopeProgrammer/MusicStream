@@ -13,7 +13,7 @@ public class RefreshToken
         => new()
         {
             Token = token,
-            ExpirationTime = DateTime.UtcNow
+            ExpirationTime = DateTime.UtcNow.AddDays(7)
         };
     public void SetTokenForUser(User user)
     {
@@ -23,7 +23,7 @@ public class RefreshToken
 
     public bool IsValid()
     {
-        if (ExpirationTime > DateTime.UtcNow)
+        if (ExpirationTime < DateTime.UtcNow)
             return false;
 
         return true;

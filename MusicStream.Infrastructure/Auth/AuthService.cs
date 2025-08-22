@@ -34,7 +34,7 @@ internal class AuthService
         await userRepository.SaveChangesAsync(cancellationToken);
 
         var accessToken = tokenGenerator.JwtToken(user.Id, subscription.Id);
-        return Response<AuthResult>.Succeed(new AuthResult(accessToken, refreshToken.Token));
+        return Response<AuthResult>.Succeed(new AuthResult(accessToken, refreshToken));
 
     }
 
@@ -48,9 +48,10 @@ internal class AuthService
             return Response<AuthResult>.Failed(ErrorMessages.LoginError());
 
         var newRefreshToken = tokenGenerator.RefreshToken();
-        await tokenRepository.UpdateUserRefreshTokenByUserId(user.Id, newRefreshToken);
+        user.RefreshToken!.Token = newRefreshToken;
+        await userRepository.SaveChangesAsync(cancellationToken);
         var accessToken = tokenGenerator.JwtToken(user.Id, user.Subscription!.Id);
-        return Response<AuthResult>.Succeed(new AuthResult(accessToken, newRefreshToken));
+        return Response<AuthResult>.Succeed(new AuthResult(accessToken, user.RefreshToken));
     }
 
 
@@ -70,7 +71,7 @@ internal class AuthService
         await tokenRepository.SaveChangesAsync(cancellationToken);
 
         var accessToken = tokenGenerator.JwtToken(refreshToken.User!.Id, refreshToken.User!.Subscription!.Id);
-        return Response<AuthResult>.Succeed(new AuthResult(accessToken, newRefreshToken));
+        return Response<AuthResult>.Succeed(new AuthResult(accessToken, refreshToken));
 
     }
 

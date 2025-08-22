@@ -8,7 +8,7 @@ namespace Music.API.Api.Controllers.IdentityController
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class IdentityController(IAuthService authService, IOptions<JwtOption> options, LinkGenerator linkGenerator) : ControllerBase
+    public class IdentityController(IAuthService authService, LinkGenerator linkGenerator) : ControllerBase
     {
         // TODO:Send refreshToken inside cookie and jwt in the response
 
@@ -22,7 +22,7 @@ namespace Music.API.Api.Controllers.IdentityController
             if (!result.IsSuccess)
                 return BadRequest(ApiResponse<IActionResult>.BadRequest(result.Error));
 
-            CookieHelper.SetCookie(HttpContext, result.Data.RefreshToken, options.Value.ExpirationInMinutes, linkGenerator);
+            CookieHelper.SetCookie(HttpContext, result.Data.RefreshToken.Token, result.Data.RefreshToken.ExpirationTime, linkGenerator);
 
             return Ok(ApiResponse<IdentityResponse>.Ok(new IdentityResponse(result.Data.AccessToken)));
         }
@@ -36,7 +36,7 @@ namespace Music.API.Api.Controllers.IdentityController
             if (!result.IsSuccess)
                 return Unauthorized();
 
-            CookieHelper.SetCookie(HttpContext, result.Data.RefreshToken, options.Value.ExpirationInMinutes, linkGenerator);
+            CookieHelper.SetCookie(HttpContext, result.Data.RefreshToken.Token, result.Data.RefreshToken.ExpirationTime, linkGenerator);
             var response = new IdentityResponse(result.Data.AccessToken);
             return ApiResponse<IdentityResponse>.Ok(response);
 
@@ -45,6 +45,7 @@ namespace Music.API.Api.Controllers.IdentityController
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [EndpointSummary("Refresh Token")]
+        // WARNING: Dont remove EndpointName. needed for set the cookie
         [EndpointName("refresh-token-endpoint")]
         public async Task<ActionResult<ApiResponse<IdentityResponse>>> SignInRefreshToken(CancellationToken cancellationToken)
         {
@@ -52,7 +53,7 @@ namespace Music.API.Api.Controllers.IdentityController
             var result = await authService.LoginUsingRefreshToken(cookie, cancellationToken);
             if (!result.IsSuccess)
                 return Unauthorized();
-            CookieHelper.SetCookie(HttpContext, result.Data.RefreshToken, options.Value.ExpirationInMinutes, linkGenerator);
+            CookieHelper.SetCookie(HttpContext, result.Data.RefreshToken.Token, result.Data.RefreshToken.ExpirationTime, linkGenerator);
             var response = new IdentityResponse(result.Data.AccessToken);
             return ApiResponse<IdentityResponse>.Ok(response);
         }
