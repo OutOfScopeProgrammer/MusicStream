@@ -32,7 +32,7 @@ IMusicRepository musicRepository)
         await subRepository.SaveChangesAsync(token);
         return Response.Succeed();
     }
-    public async Task<Response> DeletePlaylist(Guid userId, Guid playListId, CancellationToken token)
+    public async Task<Response> DeletePlaylist(Guid playListId, CancellationToken token)
     {
         var playlist = await playListRepository.GetPlaylistById(playListId, false, token);
         if (playlist is null)

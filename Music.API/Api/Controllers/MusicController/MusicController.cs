@@ -9,8 +9,7 @@ namespace Music.API.Api.Controllers.MusicController
     [Route("api/v1/[controller]")]
     public class MusicController
     (IWebHostEnvironment env, IMusicChannel musicChannel,
-    IMusicRepository musicRepository, LinkGenerator linkGenerator,
-    ISingerRepository singerRepository) : ControllerBase
+    IMusicRepository musicRepository, LinkGenerator linkGenerator) : ControllerBase
     {
 
         [HttpGet()]
@@ -43,9 +42,7 @@ namespace Music.API.Api.Controllers.MusicController
                 return NotFound(ApiResponse<MusicDto>.NotFound($"music with {musicId} does not exist"));
             var dto = MusicDtoMapper.ToMusicDto(music, linkGenerator, HttpContext);
             return Ok(dto);
-
         }
-
 
         [HttpPost()]
         [Consumes("multipart/form-data")]
@@ -57,18 +54,14 @@ namespace Music.API.Api.Controllers.MusicController
         [EndpointSummary("Create music")]
         public async Task<IActionResult> CreateMusic([FromForm] CreateMusicDto dto, CancellationToken cancellationToken)
         {
-            Guid.TryParse(dto.SingerId, out var id);
-            var singerExist = await singerRepository.GetSingerById(id, true, cancellationToken);
-            if (singerExist is null)
-                return NotFound(ApiResponse<IActionResult>.NotFound($"singer  not found. id: {dto.SingerId}"));
+
             var (fullPath, fileName, uploadPath) = FileHelper.PrepareFileForSaving(dto.File.FileName, env.WebRootPath);
             Directory.CreateDirectory(uploadPath);
 
             using var fileStream = System.IO.File.Create(fullPath);
             await dto.File.CopyToAsync(fileStream, cancellationToken);
 
-            var message = new MusicChannelMessage(fullPath, env.WebRootPath, fileName,
-            dto.Title, dto.Description, id);
+            var message = new MusicChannelMessage(fullPath, env.WebRootPath, fileName);
 
             await musicChannel.SendAsync(message);
             return Ok(ApiResponse<IActionResult>.Ok());

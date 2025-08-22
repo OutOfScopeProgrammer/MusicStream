@@ -1,3 +1,4 @@
+using Microsoft.OpenApi.Models;
 using Music.API.Extensions;
 using MusicStream.Application.Extensions;
 using MusicStream.Application.Interfaces;
@@ -12,7 +13,12 @@ builder.Services.AddOpenApi();
 var app = builder.Build();
 app.UseStaticFiles();
 app.MapOpenApi();
-app.MapScalarApiReference();
+app.MapScalarApiReference(options =>
+{
+    options.WithTitle("Music Stream API")
+           .WithTheme(ScalarTheme.Mars)
+           .WithDarkMode();
+});
 
 app.UseAuthentication();
 app.UseAuthorization();

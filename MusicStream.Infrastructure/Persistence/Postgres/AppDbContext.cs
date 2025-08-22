@@ -9,7 +9,6 @@ internal class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(
     public DbSet<User> Users { get; set; }
     public DbSet<Music> Musics { get; set; }
     public DbSet<Subscription> Subscriptions { get; set; }
-    public DbSet<Singer> Singers { get; set; }
     public DbSet<Playlist> Playlists { get; set; }
     public DbSet<RefreshToken> RefreshTokens { get; set; }
 

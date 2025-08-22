@@ -37,7 +37,7 @@ IMusicChannel channel,
 
                 await CleanUpDisk();
                 var streamUrl = $"{msg.FileName}/manifest.mpd";
-                await SaveMusic(msg.Title, msg.Description, streamUrl, msg.SingerId);
+                // await SaveMusic(msg.Title, msg.Description, streamUrl);
 
             }
 
@@ -64,11 +64,11 @@ IMusicChannel channel,
 
 
 
-    private async Task SaveMusic(string title, string description, string streamUrl, Guid singerId)
+    private async Task SaveMusic(string title, string description, string streamUrl)
     {
         using var scope = scopeFactory.CreateScope();
         var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-        var music = Music.Create(title, description, false, singerId, streamUrl);
+        var music = Music.Create(title, description, false, streamUrl);
         dbContext.Add(music);
         await dbContext.SaveChangesAsync();
     }

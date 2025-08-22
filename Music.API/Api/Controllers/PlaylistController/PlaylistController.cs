@@ -1,4 +1,5 @@
-using System.Data;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Music.API.Helper;
 using MusicStream.Application.Common;
@@ -8,8 +9,27 @@ namespace Music.API.Api.Controllers.PlaylistController
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class PlaylistController(PlaylistService playlistService, LinkGenerator linkGenerator) : ControllerBase
     {
+
+
+
+        [HttpPost]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [EndpointSummary("Create a playlist")]
+
+        public async Task<ActionResult<ApiResponse>> CreatePlaylist(CreatePlaylistDto dto, CancellationToken cancellationToken)
+        {
+            var token = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            Guid.TryParse(token, out var userId);
+            var response = await playlistService.CreatePlaylist(userId, cancellationToken, dto.Title);
+            if (!response.IsSuccess)
+                return BadRequest(ApiResponse.BadRequest(response.Error));
+
+            return Ok(ApiResponse.Ok());
+        }
 
         [HttpGet("{playlistId:guid}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -45,7 +65,7 @@ namespace Music.API.Api.Controllers.PlaylistController
         [HttpDelete("{playlistId:guid}/{musicId:guid}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        [EndpointSummary("Remove music to playlist")]
+        [EndpointSummary("Remove music From playlist")]
         public async Task<ActionResult<ApiResponse>> RemoveMusicToPlaylist(Guid playlistId, Guid musicId, CancellationToken token)
         {
             var response = await playlistService.RemoveMusicFromPlaylist(musicId, playlistId, token);
@@ -58,7 +78,7 @@ namespace Music.API.Api.Controllers.PlaylistController
         [HttpDelete("{playlistId:guid}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        [EndpointSummary("Remove music to playlist")]
+        [EndpointSummary("Remove music From playlist")]
         public async Task<ActionResult<ApiResponse<string>>> UpdatePlaylist(Guid playlistId, UpdatePlaylistDto dto, CancellationToken token)
         {
             //  Get user id from token or subscription
@@ -72,11 +92,11 @@ namespace Music.API.Api.Controllers.PlaylistController
         [HttpPut("{playlistId:guid}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        [EndpointSummary("Remove music to playlist")]
+        [EndpointSummary("Remove playlist")]
         public async Task<ActionResult<ApiResponse>> RemovePlaylist(Guid playlistId, CancellationToken token)
         {
             //  Get user id from token or subscription
-            var response = await playlistService.DeletePlaylist(Guid.NewGuid(), playlistId, token);
+            var response = await playlistService.DeletePlaylist(playlistId, token);
             if (!response.IsSuccess)
                 return BadRequest(ApiResponse.BadRequest(response.Error));
             return NoContent();

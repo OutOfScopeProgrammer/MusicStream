@@ -11,15 +11,12 @@ public class Music : Auditable
     public List<Playlist> Playlist { get; set; } = [];
     public bool IsAvailable { get; set; }
 
-    public Singer? Singer { get; set; } = new();
-    public Guid? SingerId { get; set; }
 
-    public static Music Create(string title, string description, bool isAvailable, Guid singerId, string streamUrl)
+    public static Music Create(string title, string description, bool isAvailable, string streamUrl)
         => new()
         {
             Title = title,
             Description = description,
-            SingerId = singerId,
             IsAvailable = isAvailable,
             StreamUrl = streamUrl
         };

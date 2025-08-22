@@ -31,7 +31,6 @@ public static class ServiceCollectionExtension
         services.AddHostedService<MusicProcessingBackgroundService>();
         services.AddSingleton<MusicProcessor>();
         services.AddScoped<IMusicRepository, MusicRepository>();
-        services.AddScoped<ISingerRepository, SingerRepository>();
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<ISubscriptionRepository, SubscriptionRepository>();
         services.AddScoped<IPlayListRepository, PlaylistRepository>();

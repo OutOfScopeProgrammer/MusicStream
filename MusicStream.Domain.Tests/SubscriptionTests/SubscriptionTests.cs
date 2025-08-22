@@ -22,7 +22,7 @@ public class SubscriptionTests
         var playList = Playlist.Create(sub, "test");
         var result = sub.TryAddPlaylist(playList);
         // Then
-        Assert.False(result);
+        Assert.False(result.IsSuccess);
     }
     [Theory]
     [InlineData(2, SubscriptionType.Basic)]
@@ -38,7 +38,7 @@ public class SubscriptionTests
         var playList = Playlist.Create(sub, "test");
         var result = sub.TryAddPlaylist(playList);
         // Then
-        Assert.True(result);
+        Assert.True(result.IsSuccess);
     }
 
 }
