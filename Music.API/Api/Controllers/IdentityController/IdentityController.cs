@@ -46,9 +46,10 @@ namespace Music.API.Api.Controllers.IdentityController
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [EndpointSummary("Refresh Token")]
         [EndpointName("refresh-token-endpoint")]
-        public async Task<ActionResult<ApiResponse<IdentityResponse>>> SignInRefreshToken(RefreshTokenDto dto, CancellationToken cancellationToken)
+        public async Task<ActionResult<ApiResponse<IdentityResponse>>> SignInRefreshToken(CancellationToken cancellationToken)
         {
-            var result = await authService.LoginUsingRefreshToken(dto.RefreshToken, cancellationToken);
+            var cookie = CookieHelper.GetRefreshToken(HttpContext);
+            var result = await authService.LoginUsingRefreshToken(cookie, cancellationToken);
             if (!result.IsSuccess)
                 return Unauthorized();
             CookieHelper.SetCookie(HttpContext, result.Data.RefreshToken, options.Value.ExpirationInMinutes, linkGenerator);

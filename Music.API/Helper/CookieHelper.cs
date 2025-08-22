@@ -6,6 +6,7 @@ public static class CookieHelper
     public static void SetCookie(HttpContext context, string token, int expireTimeInMinute, LinkGenerator linkGenerator)
     {
         var refreshEndpoint = linkGenerator.GetUriByName(context, "refresh-token-endpoint");
+        var uri = new Uri(refreshEndpoint);
 
         var option = new CookieOptions
         {
@@ -13,9 +14,15 @@ public static class CookieHelper
             HttpOnly = true,
             SameSite = SameSiteMode.Strict,
             Expires = DateTimeOffset.UtcNow.AddMinutes(expireTimeInMinute),
-            Path = refreshEndpoint
+            Path = uri.AbsolutePath
         };
         context.Response.Cookies.Append("refresh-token", token, option);
+    }
+
+    public static string GetRefreshToken(HttpContext context)
+    {
+        var token = context.Request.Cookies.First(c => c.Key == "refresh-token");
+        return token.Value;
     }
 
 }
