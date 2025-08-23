@@ -1,6 +1,6 @@
 namespace MusicStream.Application.Interfaces;
 
-public record MusicChannelMessage(string TempFilePath, string RootFolder, string FileName);
+public record MusicChannelMessage(string TempFilePath, string RootFolder, string StoredName);
 
 public interface IMusicChannel
 {

@@ -2,17 +2,15 @@ namespace Music.API.Helper;
 
 public static class FileHelper
 {
-    public static (string FullPath, string FileName, string UploadPath)
+    public static (string filePath, string storedName)
     PrepareFileForSaving(string fileName, string WebRootPath)
     {
         var ext = Path.GetExtension(fileName);
-        var name = Path.GetFileNameWithoutExtension(fileName);
-        var uploadPath = Path.Combine(WebRootPath, "Temp");
-        var storedName = $"{Guid.NewGuid()}{ext}";
-        var filePath = Path.Combine(uploadPath, storedName);
+        var storedname = Guid.NewGuid().ToString();
+        var storedNameWithExt = $"{storedname}{ext}";
+        var filePath = Path.Combine(WebRootPath, storedNameWithExt);
 
-
-        return (filePath, name, uploadPath);
+        return (filePath, storedname);
     }
 
 }

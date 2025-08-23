@@ -26,20 +26,25 @@ IMusicChannel channel,
 
                 Console.WriteLine("Processing....");
 
-                var outputFolder = Path.Combine(ROOTFOLDER, msg.FileName);
+                var outputFolder = Path.Combine(ROOTFOLDER, msg.StoredName);
                 Directory.CreateDirectory(outputFolder);
 
                 var metaData = await musicProcessor.ConvertForDash(msg.TempFilePath, outputFolder);
 
-                var files = GetFiles(outputFolder);
+                var files = Directory.GetFiles(outputFolder);
                 Console.WriteLine("Sending to minio....");
 
                 await musicStorage.BatchUploadToMinio(files, ROOTFOLDER);
 
-                // await CleanUpDisk();
-                var streamUrl = $"{msg.FileName}/manifest.mpd";
-                await SaveMusic(metaData, streamUrl);
 
+                var streamUrl = $"{msg.StoredName}/manifest.mpd";
+                await SaveMusic(metaData!, streamUrl);
+
+                await Task.Run(() =>
+               {
+                   File.Delete(msg.TempFilePath);
+                   Directory.Delete(outputFolder, true);
+               }, stoppingToken);
             }
 
         }
@@ -47,21 +52,7 @@ IMusicChannel channel,
 
 
 
-    private async Task CleanUpDisk()
-    {
-        foreach (var dir in Directory.GetDirectories(ROOTFOLDER))
-        {
-            await Task.Run(() => Directory.Delete(dir, true));
-        }
-    }
 
-    private string[] GetFiles(string dirPath)
-    {
-        var dirs = Directory.GetFiles(dirPath);
-
-        return dirs;
-
-    }
 
 
 
