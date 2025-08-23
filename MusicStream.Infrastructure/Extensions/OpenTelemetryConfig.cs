@@ -11,9 +11,7 @@ public static class OpenTelemetryConfig
     public static void AddOpenTelemetry(this IServiceCollection services)
     {
         var meterProvider = Sdk.CreateMeterProviderBuilder()
-        .AddMeter(AppMeters.FFPROBEPROCESS)
-        .AddMeter(AppMeters.FFMPEGSPROCESS)
-        .AddMeter(AppMeters.MUSICBACKGROUNDSERVICE)
+        .AddMeter(FFMeter.FFMPEGSPROCESS)
         .AddAspNetCoreInstrumentation()
         .AddRuntimeInstrumentation()
         .Build();

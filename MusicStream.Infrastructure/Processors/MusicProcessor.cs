@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using System.Text;
 using System.Text.Json;
+using MusicStream.Infrastructure.Observability;
 
 namespace MusicStream.Infrastructure.Processors
 {
@@ -20,6 +21,7 @@ namespace MusicStream.Infrastructure.Processors
 
         public async Task<FFProbeResult?> ConvertForDash(string inputFile, string outputFolder)
         {
+
             var sb = new StringBuilder();
             sb.Append($"-i \"{inputFile}\" ")
             .Append($"-filter_complex ") // need space at the end
@@ -44,6 +46,9 @@ namespace MusicStream.Infrastructure.Processors
 
         private async Task RunFFmpeg(string ffmpegArguments)
         {
+            var stopWatch = new Stopwatch();
+            stopWatch.Start();
+
             using var process = new Process
             {
                 StartInfo = new ProcessStartInfo
@@ -66,15 +71,30 @@ namespace MusicStream.Infrastructure.Processors
 
             if (process.ExitCode != 0)
             {
-                Console.WriteLine("FFmpeg Error:");
+                FFMeter.FFmpegCounter.Add(1, new KeyValuePair<string, object?>("status", "failed"));
+
                 Console.WriteLine(stderr);
                 Console.WriteLine(stdout);
                 throw new Exception($"FFmpeg exited with code {process.ExitCode}");
             }
+            else
+            {
+                FFMeter.FFmpegCounter.Add(1, new KeyValuePair<string, object?>("status", "success"));
+            }
+
+
+            stopWatch.Stop();
+            FFMeter.FFmpegDuration.Record(stopWatch.Elapsed.TotalSeconds);
+
         }
 
         private async Task<FFProbeResult?> RunFFProble(string inputFile)
         {
+            var stopWatch = new Stopwatch();
+            stopWatch.Start();
+
+
+
             var args = $"-v quiet -print_format json -show_format -show_streams \"{inputFile}\"";
             using var process = new Process
             {
@@ -101,14 +121,25 @@ namespace MusicStream.Infrastructure.Processors
 
             if (process.ExitCode != 0)
             {
-                Console.WriteLine("FFProbe Error:");
+                FFMeter.FFprobeCounter.Add(1, new KeyValuePair<string, object?>("status", "failed"));
+
                 Console.WriteLine(stderr);
                 Console.WriteLine(stdout);
+
                 throw new Exception($"FFProbe exited with code {process.ExitCode}");
+            }
+            else
+            {
+                FFMeter.FFprobeCounter.Add(1, new KeyValuePair<string, object?>("status", "success"));
+
             }
 
             var metaData = JsonSerializer.Deserialize<FFProbeResult>(output,
             new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+
+            stopWatch.Stop();
+            FFMeter.FFprobeDuration.Record(stopWatch.Elapsed.TotalSeconds);
+
             return metaData;
         }
     }
