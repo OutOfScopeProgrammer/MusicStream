@@ -22,38 +22,40 @@ IMusicChannel channel,
 
             if (await channel.WaitToReadAsync())
             {
-                var msg = await channel.ReadAsync();
+                try
+                {
+                    var msg = await channel.ReadAsync();
 
-                Console.WriteLine("Processing....");
+                    Console.WriteLine("Processing....");
 
-                var outputFolder = Path.Combine(ROOTFOLDER, msg.StoredName);
-                Directory.CreateDirectory(outputFolder);
+                    var outputFolder = Path.Combine(ROOTFOLDER, msg.StoredName);
+                    Directory.CreateDirectory(outputFolder);
 
-                var metaData = await musicProcessor.ConvertForDash(msg.TempFilePath, outputFolder);
+                    var metaData = await musicProcessor.ConvertForDash(msg.TempFilePath, outputFolder);
 
-                var files = Directory.GetFiles(outputFolder);
-                Console.WriteLine("Sending to minio....");
+                    var files = Directory.GetFiles(outputFolder);
+                    Console.WriteLine("Sending to minio....");
 
-                await musicStorage.BatchUploadToMinio(files, ROOTFOLDER);
+                    await musicStorage.BatchUploadToMinio(files, ROOTFOLDER);
 
 
-                var streamUrl = $"{msg.StoredName}/manifest.mpd";
-                await SaveMusic(metaData!, streamUrl);
+                    var streamUrl = $"{msg.StoredName}/manifest.mpd";
+                    await SaveMusic(metaData!, streamUrl);
 
-                await Task.Run(() =>
-               {
-                   File.Delete(msg.TempFilePath);
-                   Directory.Delete(outputFolder, true);
-               }, stoppingToken);
+                    await Task.Run(() =>
+                   {
+                       File.Delete(msg.TempFilePath);
+                       Directory.Delete(outputFolder, true);
+                   }, stoppingToken);
+                }
+                catch (Exception)
+                {
+                    throw;
+                }
             }
 
         }
     }
-
-
-
-
-
 
 
     private async Task SaveMusic(FFProbeResult metaData, string streamUrl)
