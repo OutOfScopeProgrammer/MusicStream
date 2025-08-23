@@ -8,7 +8,7 @@ namespace MusicStream.Infrastructure.Extensions;
 public static class OpenTelemetryConfig
 {
 
-    public static void AddOpenTelemetry(this IServiceCollection services)
+    public static void AddOpenTelemetryConfiguration(this IServiceCollection services)
     {
         var meterProvider = Sdk.CreateMeterProviderBuilder()
         .AddMeter(FFMeter.FFMPEGSPROCESS)
