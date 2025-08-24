@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Routing.Constraints;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using MusicStream.Application.Interfaces;
@@ -26,30 +27,39 @@ IMusicChannel channel,
             {
                 try
                 {
-                    var str = watcher.CreatedFiles;
+                    var fileManager = new FileManager();
+                    while (watcher.CreatedFiles.TryDequeue(out var filePath))
+                    {
+                        if (!await fileManager.IsFileReady(filePath))
+                            continue;
+                        var task = Task.Run(async () =>
+                        {
+                            var outputFolder = Path.Combine(ROOTFOLDER, Path.GetFileNameWithoutExtension(filePath));
+                            Directory.CreateDirectory(outputFolder);
+
+                            var metaData = await musicProcessor.ConvertForDash(filePath, outputFolder);
+
+                            var files = await fileManager.GetFilesFromDirectory(outputFolder);
+                            Console.WriteLine("Sending to minio....");
+
+                            //     await musicStorage.BatchUploadToMinio(files, ROOTFOLDER);
+
+
+                            //     var streamUrl = $"{msg.StoredName}/manifest.mpd";
+                            //     await SaveMusic(metaData!, streamUrl);
+
+                            //     await Task.Run(() =>
+                            //    {
+                            //        File.Delete(msg.TempFilePath);
+                            //        Directory.Delete(outputFolder, true);
+                            //    }, stoppingToken);
+                        });
+                    }
                     var msg = await channel.ReadAsync();
 
                     Console.WriteLine("Processing....");
 
-                    var outputFolder = Path.Combine(ROOTFOLDER, msg.StoredName);
-                    Directory.CreateDirectory(outputFolder);
 
-                    var metaData = await musicProcessor.ConvertForDash(msg.TempFilePath, outputFolder);
-
-                    var files = Directory.GetFiles(outputFolder);
-                    Console.WriteLine("Sending to minio....");
-
-                    await musicStorage.BatchUploadToMinio(files, ROOTFOLDER);
-
-
-                    var streamUrl = $"{msg.StoredName}/manifest.mpd";
-                    await SaveMusic(metaData!, streamUrl);
-
-                    await Task.Run(() =>
-                   {
-                       File.Delete(msg.TempFilePath);
-                       Directory.Delete(outputFolder, true);
-                   }, stoppingToken);
                 }
                 catch (Exception)
                 {

@@ -4,11 +4,29 @@ public class FileManager
 {
 
 
+    public async Task<IEnumerable<string>> GetFilesFromDirectory(string dirpath)
+    {
+        int maxRetry = 10;
+
+        for (var i = 0; i < maxRetry; i++)
+        {
+            if (CheckIfDirectoryReady(dirpath))
+            {
+                return Directory.EnumerateFiles(dirpath);
+            }
+            await Task.Delay(200);
+        }
+        return Enumerable.Empty<string>();
+    }
+    public void DeleteSingleFile(string filePath) => File.Delete(filePath);
+    public void DeleteSingleDirectory(string dirpath) => Directory.Delete(dirpath, true);
+
+
     public async Task<bool> IsFileReady(string filePath, int maxRetry = 10)
     {
         for (var i = 0; i < maxRetry; i++)
         {
-            if (CheckIfReady(filePath))
+            if (CheckIfFileReady(filePath))
                 return true;
             await Task.Delay(200);
 
@@ -16,7 +34,7 @@ public class FileManager
         return false;
     }
 
-    private bool CheckIfReady(string filePath)
+    private bool CheckIfFileReady(string filePath)
     {
         try
         {
@@ -27,5 +45,20 @@ public class FileManager
         {
             return false;
         }
+    }
+
+    private bool CheckIfDirectoryReady(string dirpath)
+    {
+        try
+        {
+            var entries = Directory.EnumerateFiles(dirpath).FirstOrDefault();
+            return true;
+
+        }
+        catch (IOException)
+        {
+            return false;
+        }
+
     }
 }

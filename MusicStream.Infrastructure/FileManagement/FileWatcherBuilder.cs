@@ -37,6 +37,7 @@ public class FileWatcher
     public ConcurrentQueue<string> CreatedFiles;
     public FileWatcher(FileSystemWatcher watcher)
     {
+        CreatedFiles = new();
         _fileWatcher = watcher;
         _fileWatcher.Created += (s, e) => OnCreate(e);
         // _fileWatcher.Deleted += (s, e) => OnDelete(e);
