@@ -42,7 +42,7 @@ IMusicChannel channel,
                             var files = await fileManager.GetFilesFromDirectory(outputFolder);
                             Console.WriteLine("Sending to minio....");
 
-                            //     await musicStorage.BatchUploadToMinio(files, ROOTFOLDER);
+                            await musicStorage.BatchUploadToMinio(files, ROOTFOLDER);
 
 
                             //     var streamUrl = $"{msg.StoredName}/manifest.mpd";

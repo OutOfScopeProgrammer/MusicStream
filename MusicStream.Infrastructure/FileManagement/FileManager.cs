@@ -16,7 +16,7 @@ public class FileManager
             }
             await Task.Delay(200);
         }
-        return Enumerable.Empty<string>();
+        return [];
     }
     public void DeleteSingleFile(string filePath) => File.Delete(filePath);
     public void DeleteSingleDirectory(string dirpath) => Directory.Delete(dirpath, true);

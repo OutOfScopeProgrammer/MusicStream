@@ -34,7 +34,7 @@ internal class MusicStorage(MinioConnection minio) : IMusicStorage
         memory.Position = 0;
         return memory;
     }
-    public async Task BatchUploadToMinio(string[] files, string rootFolder)
+    public async Task BatchUploadToMinio(IEnumerable<string> files, string rootFolder)
     {
         var tasks = new List<Task>();
         foreach (var file in files)
