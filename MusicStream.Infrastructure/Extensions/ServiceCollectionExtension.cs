@@ -29,6 +29,7 @@ public static class ServiceCollectionExtension
         services.AddScoped<IBucketManager, BucketManager>();
         services.AddSingleton<IMusicChannel, MusicChannel>();
         services.AddHostedService<MusicProcessingBackgroundService>();
+
         services.AddSingleton<MusicProcessor>();
         services.AddScoped<IMusicRepository, MusicRepository>();
         services.AddScoped<IUserRepository, UserRepository>();

@@ -1,3 +1,5 @@
+using System.Collections.Concurrent;
+
 namespace MusicStream.Infrastructure.FileManagement;
 
 public class FileWatcherBuilder
@@ -32,20 +34,24 @@ public class FileWatcherBuilder
 public class FileWatcher
 {
     public FileSystemWatcher _fileWatcher { get; set; }
+    public ConcurrentQueue<string> CreatedFiles;
     public FileWatcher(FileSystemWatcher watcher)
     {
         _fileWatcher = watcher;
         _fileWatcher.Created += (s, e) => OnCreate(e);
-        _fileWatcher.Deleted += (s, e) => OnDelete(e);
-        _fileWatcher.Changed += (s, e) => OnChanged(e);
+        // _fileWatcher.Deleted += (s, e) => OnDelete(e);
+        // _fileWatcher.Changed += (s, e) => OnChanged(e);
     }
 
     public void Start() => _fileWatcher.EnableRaisingEvents = true;
     public void Stop() => _fileWatcher.EnableRaisingEvents = false;
 
-    public void OnChanged(FileSystemEventArgs @event) { }
-    public void OnDelete(FileSystemEventArgs @event) { }
-    public void OnCreate(FileSystemEventArgs @event) { }
+    // public void OnChanged(FileSystemEventArgs @event) { }
+    // public void OnDelete(FileSystemEventArgs @event) { }
+    public void OnCreate(FileSystemEventArgs @event)
+    {
+        CreatedFiles.Enqueue(@event.FullPath);
+    }
 
 
 

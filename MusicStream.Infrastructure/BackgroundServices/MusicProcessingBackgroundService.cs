@@ -2,6 +2,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using MusicStream.Application.Interfaces;
 using MusicStream.Domain.Entities;
+using MusicStream.Infrastructure.FileManagement;
 using MusicStream.Infrastructure.Persistence.Postgres;
 using MusicStream.Infrastructure.Processors;
 
@@ -16,6 +17,8 @@ IMusicChannel channel,
     private const string ROOTFOLDER = @"E:\ASP.NET\MusicStream\Music.APi\wwwroot";
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
+        var watcher = new FileWatcherBuilder().FolderToWatch(ROOTFOLDER).Filter("*.mp3").Build();
+        watcher.Start();
         while (!stoppingToken.IsCancellationRequested)
         {
 
@@ -23,6 +26,7 @@ IMusicChannel channel,
             {
                 try
                 {
+                    var str = watcher.CreatedFiles;
                     var msg = await channel.ReadAsync();
 
                     Console.WriteLine("Processing....");
