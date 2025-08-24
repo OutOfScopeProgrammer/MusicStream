@@ -11,7 +11,6 @@ namespace MusicStream.Infrastructure.BackgroundServices;
 
 internal class MusicProcessingBackgroundService
 (IMusicStorage musicStorage,
-IMusicChannel channel,
  MusicProcessor musicProcessor,
  IServiceScopeFactory scopeFactory) : BackgroundService
 {
@@ -22,52 +21,49 @@ IMusicChannel channel,
         watcher.Start();
         while (!stoppingToken.IsCancellationRequested)
         {
-
-            if (await channel.WaitToReadAsync())
+            await watcher._semaphore.WaitAsync(stoppingToken);
+            try
             {
-                try
+                var fileManager = new FileManager();
+                while (watcher.CreatedFiles.TryDequeue(out var filePath))
                 {
-                    var fileManager = new FileManager();
-                    while (watcher.CreatedFiles.TryDequeue(out var filePath))
+                    if (!await fileManager.IsFileReady(filePath))
+                        continue;
+                    var task = Task.Run(async () =>
                     {
-                        if (!await fileManager.IsFileReady(filePath))
-                            continue;
-                        var task = Task.Run(async () =>
+                        var fileName = Path.GetFileNameWithoutExtension(filePath);
+                        var outputFolder = Path.Combine(ROOTFOLDER, fileName);
+                        Directory.CreateDirectory(outputFolder);
+
+                        var metaData = await musicProcessor.ConvertForDash(filePath, outputFolder);
+
+                        var response = await fileManager.GetFilesFromDirectory(outputFolder);
+                        Console.WriteLine("Sending to minio....");
+                        if (response.IsSuccess)
                         {
-                            var outputFolder = Path.Combine(ROOTFOLDER, Path.GetFileNameWithoutExtension(filePath));
-                            Directory.CreateDirectory(outputFolder);
+                            await musicStorage.BatchUploadToMinio(response.Data, ROOTFOLDER);
+                            var streamUrl = $"{fileName}/manifest.mpd";
+                            await SaveMusic(metaData!, streamUrl);
 
-                            var metaData = await musicProcessor.ConvertForDash(filePath, outputFolder);
-
-                            var files = await fileManager.GetFilesFromDirectory(outputFolder);
-                            Console.WriteLine("Sending to minio....");
-
-                            await musicStorage.BatchUploadToMinio(files, ROOTFOLDER);
-
-
-                            //     var streamUrl = $"{msg.StoredName}/manifest.mpd";
-                            //     await SaveMusic(metaData!, streamUrl);
-
-                            //     await Task.Run(() =>
-                            //    {
-                            //        File.Delete(msg.TempFilePath);
-                            //        Directory.Delete(outputFolder, true);
-                            //    }, stoppingToken);
-                        });
-                    }
-                    var msg = await channel.ReadAsync();
-
-                    Console.WriteLine("Processing....");
-
-
-                }
-                catch (Exception)
-                {
-                    throw;
+                            await Task.Run(() =>
+                           {
+                               File.Delete(filePath);
+                               Directory.Delete(outputFolder, true);
+                           }, stoppingToken);
+                        }
+                        else
+                        {
+                            throw new Exception("File problem");
+                        }
+                    });
                 }
             }
-
+            catch (Exception)
+            {
+                throw;
+            }
         }
+
     }
 
 

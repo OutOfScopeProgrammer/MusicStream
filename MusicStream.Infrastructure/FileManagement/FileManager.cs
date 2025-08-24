@@ -1,10 +1,12 @@
+using MusicStream.Domain.Common;
+
 namespace MusicStream.Infrastructure.FileManagement;
 
 public class FileManager
 {
 
 
-    public async Task<IEnumerable<string>> GetFilesFromDirectory(string dirpath)
+    public async Task<Response<IEnumerable<string>>> GetFilesFromDirectory(string dirpath)
     {
         int maxRetry = 10;
 
@@ -12,11 +14,11 @@ public class FileManager
         {
             if (CheckIfDirectoryReady(dirpath))
             {
-                return Directory.EnumerateFiles(dirpath);
+                return Response<IEnumerable<string>>.Succeed(Directory.EnumerateFiles(dirpath));
             }
             await Task.Delay(200);
         }
-        return [];
+        return Response<IEnumerable<string>>.Failed("Directory is locked or does not exist");
     }
     public void DeleteSingleFile(string filePath) => File.Delete(filePath);
     public void DeleteSingleDirectory(string dirpath) => Directory.Delete(dirpath, true);

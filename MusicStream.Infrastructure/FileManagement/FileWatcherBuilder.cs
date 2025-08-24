@@ -34,6 +34,7 @@ public class FileWatcherBuilder
 public class FileWatcher
 {
     public FileSystemWatcher _fileWatcher { get; set; }
+    public SemaphoreSlim _semaphore = new(0);
     public ConcurrentQueue<string> CreatedFiles;
     public FileWatcher(FileSystemWatcher watcher)
     {
@@ -52,6 +53,7 @@ public class FileWatcher
     public void OnCreate(FileSystemEventArgs @event)
     {
         CreatedFiles.Enqueue(@event.FullPath);
+        _semaphore.Release();
     }
 
 
