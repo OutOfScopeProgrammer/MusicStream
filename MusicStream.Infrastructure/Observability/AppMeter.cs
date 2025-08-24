@@ -1,5 +1,3 @@
-using System.Diagnostics.Metrics;
-
 namespace MusicStream.Infrastructure.Observability;
 
 public static class AppMeters

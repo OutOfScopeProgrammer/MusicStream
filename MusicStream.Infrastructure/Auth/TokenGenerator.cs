@@ -5,7 +5,6 @@ using System.Text;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using MusicStream.Application.Interfaces.Auth;
-using MusicStream.Domain.Entities;
 
 namespace MusicStream.Infrastructure.Auth;
 

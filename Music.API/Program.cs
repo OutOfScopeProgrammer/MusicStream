@@ -1,4 +1,3 @@
-using Microsoft.OpenApi.Models;
 using Music.API.Extensions;
 using MusicStream.Application.Extensions;
 using MusicStream.Application.Interfaces;

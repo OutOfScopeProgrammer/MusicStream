@@ -1,5 +1,3 @@
-using MusicStream.Domain.Entities;
-
 namespace MusicStream.Application.Interfaces.Auth;
 
 public interface ITokenGenerator

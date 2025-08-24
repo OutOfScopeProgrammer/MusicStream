@@ -1,8 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Options;
 using Music.API.Helper;
 using MusicStream.Application.Interfaces.Auth;
-using MusicStream.Infrastructure.Auth;
 
 namespace Music.API.Api.Controllers.IdentityController
 {
