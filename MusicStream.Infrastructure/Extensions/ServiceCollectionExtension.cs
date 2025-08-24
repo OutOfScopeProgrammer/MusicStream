@@ -30,7 +30,9 @@ public static class ServiceCollectionExtension
         services.AddSingleton<IMusicChannel, MusicChannel>();
         services.AddHostedService<MusicProcessingBackgroundService>();
 
-        services.AddSingleton<MusicProcessor>();
+        services.AddSingleton<FFProcessor>();
+        services.AddSingleton<MusicFileProcessor>();
+
         services.AddScoped<IMusicRepository, MusicRepository>();
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<ISubscriptionRepository, SubscriptionRepository>();

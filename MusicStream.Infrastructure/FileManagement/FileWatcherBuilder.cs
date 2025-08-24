@@ -35,10 +35,10 @@ public class FileWatcher
 {
     public FileSystemWatcher _fileWatcher { get; set; }
     public SemaphoreSlim _semaphore = new(0);
-    public ConcurrentQueue<string> CreatedFiles;
+    public ConcurrentQueue<string> _createdFiles;
     public FileWatcher(FileSystemWatcher watcher)
     {
-        CreatedFiles = new();
+        _createdFiles = new();
         _fileWatcher = watcher;
         _fileWatcher.Created += (s, e) => OnCreate(e);
         // _fileWatcher.Deleted += (s, e) => OnDelete(e);
@@ -52,9 +52,13 @@ public class FileWatcher
     // public void OnDelete(FileSystemEventArgs @event) { }
     public void OnCreate(FileSystemEventArgs @event)
     {
-        CreatedFiles.Enqueue(@event.FullPath);
+        _createdFiles.Enqueue(@event.FullPath);
         _semaphore.Release();
     }
+
+    public async Task WaitForFileAsnc(CancellationToken cancellationToken)
+        => await _semaphore.WaitAsync(cancellationToken);
+
 
 
 

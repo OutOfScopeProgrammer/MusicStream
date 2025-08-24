@@ -45,6 +45,7 @@ public class FileManager
         }
         catch (IOException)
         {
+            Console.WriteLine("File IOExecption");
             return false;
         }
     }
@@ -59,6 +60,7 @@ public class FileManager
         }
         catch (IOException)
         {
+            Console.WriteLine("Directory IOExecption");
             return false;
         }
 
