@@ -1,3 +1,4 @@
+using System.Runtime.CompilerServices;
 using Microsoft.Extensions.Hosting;
 using MusicStream.Infrastructure.FileManagement;
 using MusicStream.Infrastructure.Processors;
@@ -9,7 +10,7 @@ internal class MusicProcessingBackgroundService
 {
     private const string ROOTFOLDER = @"E:\ASP.NET\MusicStream\Music.APi\wwwroot";
     private readonly FileManager fileManager = new();
-
+    private readonly SemaphoreSlim concurencyLimit = new(4);
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         var watcher = new FileWatcherBuilder()
@@ -18,44 +19,25 @@ internal class MusicProcessingBackgroundService
             .Build();
         watcher.Start();
 
+        var processingTask = new List<Task>();
 
-        var concurrencyLimit = new SemaphoreSlim(4);
 
         while (!stoppingToken.IsCancellationRequested)
         {
             await watcher._semaphore.WaitAsync(stoppingToken);
-
-
             while (watcher._createdFiles.TryDequeue(out var filePath))
             {
 
+                await concurencyLimit.WaitAsync(stoppingToken);
 
-                if (!await fileManager.IsFileReady(filePath))
-                    continue;
+                var task = ProcessFileAsync(filePath, stoppingToken)
+                .ContinueWith(_ => concurencyLimit.Release(), stoppingToken);
 
-                try
-                {
-                    Console.WriteLine($"WaitAsync: {concurrencyLimit.CurrentCount}");
-                    await concurrencyLimit.WaitAsync(stoppingToken);
-                    var task = Process(filePath);
-                    await task;
-
-
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e.Message);
-                    throw;
-                }
-                finally
-                {
-                    concurrencyLimit.Release();
-                    Console.WriteLine($"Release : {concurrencyLimit.CurrentCount}");
-                }
-
+                processingTask.Add(task);
             }
-
+            processingTask.RemoveAll(t => t.IsCompleted);
         }
+        await Task.WhenAll(processingTask);
     }
     private string CreateOutputDirectory(string rootPath, string filePath)
     {
@@ -65,11 +47,21 @@ internal class MusicProcessingBackgroundService
         return outputFolder;
     }
 
-    private async Task Process(string filePath)
+    private async Task ProcessFileAsync(string filePath, CancellationToken token)
     {
-        var outputFolder = CreateOutputDirectory(ROOTFOLDER, filePath);
-        await processor.ProcessAsync(filePath, outputFolder, ROOTFOLDER);
-        fileManager.DeleteSingleFile(filePath);
-        fileManager.DeleteSingleDirectory(outputFolder);
+        try
+        {
+            if (await fileManager.IsFileReady(filePath))
+            {
+                var outputFolder = CreateOutputDirectory(ROOTFOLDER, filePath);
+                await processor.ProcessAsync(filePath, outputFolder, ROOTFOLDER);
+                fileManager.DeleteSingleFile(filePath);
+                fileManager.DeleteSingleDirectory(outputFolder);
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error processing {filePath}: {ex.Message}");
+        }
     }
 }

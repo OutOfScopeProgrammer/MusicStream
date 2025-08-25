@@ -1,22 +1,26 @@
+using System.Threading.Tasks;
 using MusicStream.Domain.Common;
 
 namespace MusicStream.Infrastructure.FileManagement;
 
 public class FileManager
 {
+    private const int MAXRETRY = 10;
+    private const int DELAYMS = 500;
 
 
     public async Task<Response<IEnumerable<string>>> GetFilesFromDirectory(string dirpath)
     {
-        int maxRetry = 10;
 
-        for (var i = 0; i < maxRetry; i++)
+
+        for (var i = 0; i < MAXRETRY; i++)
         {
-            if (CheckIfDirectoryReady(dirpath))
+            if (await CheckIfDirectoryReady(dirpath))
             {
-                return Response<IEnumerable<string>>.Succeed(Directory.EnumerateFiles(dirpath));
+                var files = await Task.Run(() => Directory.EnumerateFiles(dirpath));
+                return Response<IEnumerable<string>>.Succeed(files);
             }
-            await Task.Delay(200);
+            await Task.Delay(DELAYMS);
         }
         return Response<IEnumerable<string>>.Failed("Directory is locked or does not exist");
     }
@@ -28,19 +32,21 @@ public class FileManager
     {
         for (var i = 0; i < maxRetry; i++)
         {
-            if (CheckIfFileReady(filePath))
+            if (await CheckIfFileReady(filePath))
                 return true;
-            await Task.Delay(200);
+            await Task.Delay(DELAYMS);
 
         }
         return false;
     }
 
-    private bool CheckIfFileReady(string filePath)
+    private async Task<bool> CheckIfFileReady(string filePath)
     {
         try
         {
-            using var stream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.None);
+            using var stream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.None, 4096, useAsync: true);
+            var buffer = new byte[1];
+            _ = await stream.ReadAsync(buffer.AsMemory(0, 1));
             return true;
         }
         catch (IOException)
@@ -50,11 +56,11 @@ public class FileManager
         }
     }
 
-    private bool CheckIfDirectoryReady(string dirpath)
+    private async Task<bool> CheckIfDirectoryReady(string dirpath)
     {
         try
         {
-            var entries = Directory.EnumerateFiles(dirpath).FirstOrDefault();
+            var entries = await Task.Run(() => Directory.EnumerateFiles(dirpath).FirstOrDefault());
             return true;
 
         }
