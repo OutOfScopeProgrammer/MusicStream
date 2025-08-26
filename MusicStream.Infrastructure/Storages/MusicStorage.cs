@@ -1,6 +1,7 @@
 using Minio;
 using Minio.DataModel.Args;
 using MusicStream.Application.Interfaces;
+using MusicStream.Infrastructure.FileManagement;
 using MusicStream.Infrastructure.Persistence.Minio;
 
 namespace MusicStream.Infrastructure.Storages;
@@ -8,6 +9,7 @@ namespace MusicStream.Infrastructure.Storages;
 internal class MusicStorage(MinioConnection minio) : IMusicStorage
 {
     private readonly IMinioClient Storage = minio.Client;
+    private readonly FileManager fileManager = new();
     private const string MUSICBUCKET = "music-bucket";
 
     public async Task UploadFile(string key, string filePath)
@@ -45,11 +47,14 @@ internal class MusicStorage(MinioConnection minio) : IMusicStorage
             {
                 try
                 {
-                    await Storage.PutObjectAsync(new PutObjectArgs()
-                        .WithBucket("music-bucket")
-                        .WithObject(key)
-                        .WithFileName(file)
-                        .WithContentType(""));
+                    {
+                        using var stream = new FileStream(file, FileMode.Open, FileAccess.Read, FileShare.None);
+                        await Storage.PutObjectAsync(new PutObjectArgs()
+                            .WithBucket("music-bucket")
+                            .WithObject(key)
+                            .WithStreamData(stream)
+                            .WithContentType(""));
+                    }
                 }
                 finally
                 {

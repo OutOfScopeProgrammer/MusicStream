@@ -28,9 +28,9 @@ public class FileManager
     public void DeleteSingleDirectory(string dirpath) => Directory.Delete(dirpath, true);
 
 
-    public async Task<bool> IsFileReady(string filePath, int maxRetry = 10)
+    public async Task<bool> IsFileReady(string filePath)
     {
-        for (var i = 0; i < maxRetry; i++)
+        for (var i = 0; i < MAXRETRY; i++)
         {
             if (await CheckIfFileReady(filePath))
                 return true;
