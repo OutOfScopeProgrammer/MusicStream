@@ -10,8 +10,6 @@ internal class MusicStorage(MinioConnection minio) : IMusicStorage
     private readonly IMinioClient Storage = minio.Client;
     private const string MUSICBUCKET = "music-bucket";
 
-
-
     public async Task UploadFile(string key, string filePath)
     {
         await Storage.PutObjectAsync(new PutObjectArgs()
@@ -36,17 +34,28 @@ internal class MusicStorage(MinioConnection minio) : IMusicStorage
     }
     public async Task BatchUploadToMinio(IEnumerable<string> files, string rootFolder)
     {
+        var concurencyLimit = new SemaphoreSlim(4);
         var tasks = new List<Task>();
         foreach (var file in files)
         {
+            await concurencyLimit.WaitAsync();
             var relativePath = Path.GetRelativePath(rootFolder, file);
             var key = relativePath.Replace("\\", "/");
-            var task = Storage.PutObjectAsync(new PutObjectArgs()
-                .WithBucket("music-bucket")
-                .WithObject(key)
-                .WithFileName(file)
-                .WithContentType(""));
-
+            var task = Task.Run(async () =>
+            {
+                try
+                {
+                    await Storage.PutObjectAsync(new PutObjectArgs()
+                        .WithBucket("music-bucket")
+                        .WithObject(key)
+                        .WithFileName(file)
+                        .WithContentType(""));
+                }
+                finally
+                {
+                    concurencyLimit.Release();
+                }
+            });
             tasks.Add(task);
         }
         await Task.WhenAll(tasks);

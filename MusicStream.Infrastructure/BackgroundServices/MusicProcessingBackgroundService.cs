@@ -30,12 +30,20 @@ internal class MusicProcessingBackgroundService
 
                 await concurencyLimit.WaitAsync(stoppingToken);
 
-                var task = ProcessFileAsync(filePath, stoppingToken)
-                .ContinueWith(_ => concurencyLimit.Release(), stoppingToken);
-
+                var task = Task.Run(async () =>
+                {
+                    try
+                    {
+                        await ProcessFileAsync(filePath, stoppingToken);
+                    }
+                    finally
+                    {
+                        concurencyLimit.Release();
+                    }
+                });
+                processingTask.RemoveAll(t => t.IsCompleted);
                 processingTask.Add(task);
             }
-            processingTask.RemoveAll(t => t.IsCompleted);
         }
         await Task.WhenAll(processingTask);
     }
