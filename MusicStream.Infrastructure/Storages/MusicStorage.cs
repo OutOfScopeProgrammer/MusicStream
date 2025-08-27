@@ -9,7 +9,6 @@ namespace MusicStream.Infrastructure.Storages;
 internal class MusicStorage(MinioConnection minio) : IMusicStorage
 {
     private readonly IMinioClient Storage = minio.Client;
-    private readonly FileManager fileManager = new();
     private const string MUSICBUCKET = "music-bucket";
 
     public async Task UploadFile(string key, string filePath)

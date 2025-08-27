@@ -5,6 +5,8 @@ using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
+using Music.API.Authorizarion;
+using Music.API.Authorization;
 using Music.API.Helper;
 using Music.API.Interfaces;
 using MusicStream.Infrastructure.Auth;
@@ -73,6 +75,12 @@ public static class ServiceCollectionExtension
                 ValidAudience = jwtOption.Audience,
                 IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtOption.Secret))
             };
+            services.AddAuthorization(p =>
+            {
+                p.AddPolicy(AuthPolicy.Admin.ToString(), p => p.RequireRole(ApplicationRoles.ADMIN.ToString()));
+                p.AddPolicy(AuthPolicy.User.ToString(), p =>
+                p.RequireRole(ApplicationRoles.USER.ToString(), ApplicationRoles.ADMIN.ToString()));
+            });
 
         }); ;
     }
