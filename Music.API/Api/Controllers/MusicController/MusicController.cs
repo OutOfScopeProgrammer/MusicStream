@@ -1,4 +1,6 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Music.API.Authorizarion;
 using Music.API.Helper;
 using MusicStream.Application.Interfaces;
 using MusicStream.Application.Interfaces.Repositories;
@@ -7,6 +9,7 @@ namespace Music.API.Api.Controllers.MusicController
 {
     [ApiController]
     [Route("api/v1/[controller]")]
+    [Authorize(Policy = AuthPolicy.User)]
     public class MusicController
     (IWebHostEnvironment env, IMusicChannel musicChannel,
     IMusicRepository musicRepository, LinkGenerator linkGenerator) : ControllerBase

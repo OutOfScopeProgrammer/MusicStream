@@ -1,8 +1,8 @@
 namespace Music.API.Authorizarion;
 
-public enum AuthPolicy
+public static class AuthPolicy
 {
-    Admin,
-    User,
+    public const string Admin = "Admin";
+    public const string User = "User";
 
 }

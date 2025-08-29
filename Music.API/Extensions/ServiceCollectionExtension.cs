@@ -75,13 +75,13 @@ public static class ServiceCollectionExtension
                 ValidAudience = jwtOption.Audience,
                 IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtOption.Secret))
             };
-            services.AddAuthorization(p =>
-            {
-                p.AddPolicy(AuthPolicy.Admin.ToString(), p => p.RequireRole(ApplicationRoles.ADMIN.ToString()));
-                p.AddPolicy(AuthPolicy.User.ToString(), p =>
-                p.RequireRole(ApplicationRoles.USER.ToString(), ApplicationRoles.ADMIN.ToString()));
-            });
+        });
 
-        }); ;
+        services.AddAuthorization(p =>
+          {
+              p.AddPolicy(AuthPolicy.Admin, p => p.RequireRole(ApplicationRoles.ADMIN.ToString()));
+              p.AddPolicy(AuthPolicy.User.ToString(), p =>
+              p.RequireRole(ApplicationRoles.USER.ToString(), ApplicationRoles.ADMIN.ToString()));
+          });
     }
 }

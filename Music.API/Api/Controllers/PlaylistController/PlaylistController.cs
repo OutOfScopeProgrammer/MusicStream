@@ -1,6 +1,7 @@
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Music.API.Authorizarion;
 using Music.API.Helper;
 using MusicStream.Application.Common;
 using MusicStream.Application.Services;
@@ -9,7 +10,7 @@ namespace Music.API.Api.Controllers.PlaylistController
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
+    [Authorize(Policy = AuthPolicy.User)]
     public class PlaylistController(PlaylistService playlistService, LinkGenerator linkGenerator) : ControllerBase
     {
 
