@@ -1,4 +1,5 @@
 using System.Reflection;
+using System.Security.Claims;
 using System.Text;
 using FluentValidation;
 using FluentValidation.AspNetCore;
@@ -6,9 +7,9 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using Music.API.Authorizarion;
-using Music.API.Authorization;
 using Music.API.Helper;
 using Music.API.Interfaces;
+using Music.Infrastructure.Auth;
 using MusicStream.Infrastructure.Auth;
 
 namespace Music.API.Extensions;
@@ -65,6 +66,7 @@ public static class ServiceCollectionExtension
 
             option.TokenValidationParameters = new TokenValidationParameters
             {
+                RoleClaimType = ClaimTypes.Role,
                 ValidateIssuer = true,
                 ValidateIssuerSigningKey = true,
                 ValidateLifetime = true,
@@ -80,7 +82,7 @@ public static class ServiceCollectionExtension
         services.AddAuthorization(p =>
           {
               p.AddPolicy(AuthPolicy.Admin, p => p.RequireRole(ApplicationRoles.ADMIN.ToString()));
-              p.AddPolicy(AuthPolicy.User.ToString(), p =>
+              p.AddPolicy(AuthPolicy.User, p =>
               p.RequireRole(ApplicationRoles.USER.ToString(), ApplicationRoles.ADMIN.ToString()));
           });
     }

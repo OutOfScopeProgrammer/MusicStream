@@ -1,3 +1,4 @@
+
 using MusicStream.Domain.Common;
 
 namespace MusicStream.Domain.Entities;

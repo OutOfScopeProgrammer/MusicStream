@@ -33,7 +33,7 @@ IServiceScopeFactory scopeFactory)
         using var scope = scopeFactory.CreateScope();
         var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
         (string title, string artist, string duration, string date, string genre) = ExtractMetaData(metaData);
-        var music = Music.Create(title, artist, date, duration, genre, true, streamUrl);
+        var music = Domain.Entities.Music.Create(title, artist, date, duration, genre, true, streamUrl);
         dbContext.Add(music);
         await dbContext.SaveChangesAsync();
     }

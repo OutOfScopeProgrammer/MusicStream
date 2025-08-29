@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using System.Text.Json.Serialization;
 using MusicStream.Domain.Common;
 
@@ -13,6 +14,7 @@ public class User : Auditable
     [JsonIgnore]
     public Subscription? Subscription { get; set; }
     public RefreshToken? RefreshToken { get; set; }
+    public string Role { get; set; } = string.Empty;
 
     public void SetSubscription(Subscription subscription)
     {

@@ -10,7 +10,7 @@ namespace Music.API.Api.Controllers.PlaylistController
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(Policy = AuthPolicy.User)]
+    [Authorize(Policy = AuthPolicy.Admin)]
     public class PlaylistController(PlaylistService playlistService, LinkGenerator linkGenerator) : ControllerBase
     {
 

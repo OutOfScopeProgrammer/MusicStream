@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Identity;
+using Music.Infrastructure.Auth;
 using MusicStream.Application.Common;
 using MusicStream.Application.Interfaces.Auth;
 using MusicStream.Application.Interfaces.Repositories;
@@ -21,6 +22,7 @@ internal class AuthService
             return Response<AuthResult>.Failed(ErrorMessages.DuplicatePhoneNumber());
 
         var user = User.Create(phoneNumber);
+        user.Role = ApplicationRoles.USER.ToString();
         var subscription = Subscription.Create(Domain.Enums.SubscriptionType.Free);
         user.SetSubscription(subscription);
         var hashedPassword = passwordHasher.HashPassword(user, password);
@@ -32,8 +34,7 @@ internal class AuthService
         refreshToken.SetTokenForUser(user);
         tokenRepository.AddRefreshToken(refreshToken);
         await userRepository.SaveChangesAsync(cancellationToken);
-
-        var accessToken = tokenGenerator.JwtToken(user.Id, subscription.Id);
+        var accessToken = tokenGenerator.JwtToken(user, subscription.Id);
         return Response<AuthResult>.Succeed(new AuthResult(accessToken, refreshToken));
 
     }
@@ -50,7 +51,7 @@ internal class AuthService
         var newRefreshToken = tokenGenerator.RefreshToken();
         user.RefreshToken!.Token = newRefreshToken;
         await userRepository.SaveChangesAsync(cancellationToken);
-        var accessToken = tokenGenerator.JwtToken(user.Id, user.Subscription!.Id);
+        var accessToken = tokenGenerator.JwtToken(user, user.Subscription!.Id);
         return Response<AuthResult>.Succeed(new AuthResult(accessToken, user.RefreshToken));
     }
 
@@ -70,10 +71,8 @@ internal class AuthService
 
         await tokenRepository.SaveChangesAsync(cancellationToken);
 
-        var accessToken = tokenGenerator.JwtToken(refreshToken.User!.Id, refreshToken.User!.Subscription!.Id);
+        var accessToken = tokenGenerator.JwtToken(refreshToken.User!, refreshToken.User!.Subscription!.Id);
         return Response<AuthResult>.Succeed(new AuthResult(accessToken, refreshToken));
 
     }
-
-
 }

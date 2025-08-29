@@ -5,6 +5,7 @@ using System.Text;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using MusicStream.Application.Interfaces.Auth;
+using MusicStream.Domain.Entities;
 
 namespace MusicStream.Infrastructure.Auth;
 
@@ -12,12 +13,14 @@ internal class TokenGenerator(IOptions<JwtOption> jwtOption) : ITokenGenerator
 {
     private readonly JwtOption option = jwtOption.Value;
 
-    public string JwtToken(Guid userId, Guid subscriptionId)
+    public string JwtToken(User user, Guid subscriptionId)
     {
         var claims = new List<Claim>
         {
             new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-            new(JwtRegisteredClaimNames.Sub, userId.ToString()),
+            new(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
+            new(ClaimTypes.Role, user.Role.ToString()),
+
             new("subscription", subscriptionId.ToString()),
 
         };

@@ -1,6 +1,5 @@
 using Microsoft.EntityFrameworkCore;
 using MusicStream.Application.Interfaces.Repositories;
-using MusicStream.Domain.Entities;
 using MusicStream.Infrastructure.Persistence.Postgres;
 
 namespace MusicStream.Infrastructure.Repositories;
@@ -8,7 +7,7 @@ namespace MusicStream.Infrastructure.Repositories;
 internal class MusicRepository(AppDbContext dbContext) : IMusicRepository
 {
 
-    public async Task<Music?> GetMusicById(Guid musicId, bool asNoTracking, CancellationToken cancellationToken)
+    public async Task<Domain.Entities.Music?> GetMusicById(Guid musicId, bool asNoTracking, CancellationToken cancellationToken)
     {
         var query = dbContext.Musics.AsQueryable();
         if (asNoTracking)
@@ -16,11 +15,11 @@ internal class MusicRepository(AppDbContext dbContext) : IMusicRepository
         return await query.SingleOrDefaultAsync(m => m.Id == musicId, cancellationToken);
     }
 
-    public async Task<List<Music>?> GetMusics(CancellationToken cancellationToken)
+    public async Task<List<Domain.Entities.Music>?> GetMusics(CancellationToken cancellationToken)
     {
         return await dbContext.Musics.AsNoTracking().ToListAsync(cancellationToken);
     }
-    public void AddMusic(Music music)
+    public void AddMusic(Domain.Entities.Music music)
     => dbContext.Add(music);
 
 

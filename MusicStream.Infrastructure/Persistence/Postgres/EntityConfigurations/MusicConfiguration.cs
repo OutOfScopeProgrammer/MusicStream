@@ -4,9 +4,9 @@ using MusicStream.Domain.Entities;
 
 namespace MusicStream.Infrastructure.Persistence.Postgres.EntityConfigurations;
 
-internal class MusicConfiguration : IEntityTypeConfiguration<Music>
+internal class MusicConfiguration : IEntityTypeConfiguration<Domain.Entities.Music>
 {
-    public void Configure(EntityTypeBuilder<Music> builder)
+    public void Configure(EntityTypeBuilder<Domain.Entities.Music> builder)
     {
         builder.HasKey(m => m.Id);
         builder.Property(m => m.Title).HasMaxLength(50).IsRequired();
