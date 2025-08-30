@@ -7,9 +7,10 @@ using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddApiLayer(builder.Configuration);
-builder.Services.AddInfrastructureLayer(builder.Configuration);
+builder.Services.AddInfrastructureLayer(builder.Configuration, builder.Environment);
 builder.Services.AddApplicationLayer();
 builder.Services.AddOpenApi();
+builder.Environment.IsDevelopment();
 builder.Services.AddOpenTelemetryConfiguration();
 var app = builder.Build();
 app.UseStaticFiles();

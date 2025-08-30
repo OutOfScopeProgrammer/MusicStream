@@ -15,15 +15,17 @@ using MusicStream.Infrastructure.Persistence.Postgres.Interceptors;
 using MusicStream.Application.Interfaces.Auth;
 using Microsoft.AspNetCore.Identity;
 using MusicStream.Domain.Entities;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Hosting;
 
 namespace MusicStream.Infrastructure.Extensions;
 
 public static class ServiceCollectionExtension
 {
-    public static void AddInfrastructureLayer(this IServiceCollection services, IConfiguration configuration)
+    public static void AddInfrastructureLayer(this IServiceCollection services, IConfiguration configuration, IWebHostEnvironment environment)
     {
         services.AddMinio(configuration);
-        services.AddPostgres(configuration);
+        services.AddPostgres(configuration, environment);
         services.AddAuthServices(configuration);
         services.AddSingleton<IMusicStorage, MusicStorage>();
         services.AddScoped<IBucketManager, BucketManager>();
@@ -49,20 +51,38 @@ public static class ServiceCollectionExtension
         services.AddSingleton<MinioConnection>();
     }
 
-    private static void AddPostgres(this IServiceCollection services, IConfiguration configuration)
+    private static void AddPostgres(this IServiceCollection services, IConfiguration configuration, IWebHostEnvironment environment)
     {
-        var connectionString = configuration.GetConnectionString("Postgres")
-        ?? throw new Exception("connetion string for postgres is null");
+
+        var connectionString = Environment.GetEnvironmentVariable("DB_CONNECTION")
+                               ?? configuration.GetConnectionString("Postgres")
+                               ?? throw new Exception("No DB connection string provided");
+
+        var hostEnv = Environment.GetEnvironmentVariable("DB_HOST") ?? "localhost";
+        var userEnv = Environment.GetEnvironmentVariable("DB_USER") ?? "postgres";
+        var passwordEnv = Environment.GetEnvironmentVariable("DB_PASSWORD") ?? "password";
+        var dbEnv = Environment.GetEnvironmentVariable("DB_NAME") ?? "MusicStream";
+
+        var dockerConnectionString = $"Host={hostEnv};Port=5432;Username={userEnv};Password={passwordEnv};Database={dbEnv};SSL Mode=Disable;Trust Server Certificate=true;";
+
+        var finalConnectionString = Environment.GetEnvironmentVariable("DB_CONNECTION") == null
+                                    ? dockerConnectionString
+                                    : connectionString;
 
         services.AddScoped<IInterceptor, AuditableInterceptor>();
-        services.AddDbContext<AppDbContext>((provider, option) =>
+        services.AddDbContext<AppDbContext>((provider, options) =>
         {
             var interceptors = provider.GetServices<IInterceptor>()
-            ?? throw new Exception("problem with interceptors");
-            option.AddInterceptors(interceptors);
-            option.UseNpgsql(connectionString);
-            option.EnableSensitiveDataLogging();
-            option.EnableDetailedErrors();
+                               ?? throw new Exception("problem with interceptors");
+            options.AddInterceptors(interceptors);
+            options.UseNpgsql(finalConnectionString);
+
+            if (environment.IsDevelopment())
+            {
+                // Enable detailed errors only in development
+                options.EnableSensitiveDataLogging();
+                options.EnableDetailedErrors();
+            }
         });
     }
 

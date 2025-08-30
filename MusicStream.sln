@@ -9,7 +9,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MusicStream.Infrastructure"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MusicStream.Application", "MusicStream.Application\MusicStream.Application.csproj", "{9DA612CD-0A22-46BD-A109-CBD379202CF7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Music.API", "Music.API\Music.API.csproj", "{8240FCDF-F49B-4CFE-BBF1-9F03E43781D2}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MusicStream.API", "MusicStream.API\MusicStream.API.csproj", "{8240FCDF-F49B-4CFE-BBF1-9F03E43781D2}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MusicStream.Domain.Unit.Tests", "MusicStream.Domain.Tests\MusicStream.Domain.Unit.Tests.csproj", "{7BE8AA0C-DF1D-457E-B90B-05DEF90BA6A8}"
 EndProject
