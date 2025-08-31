@@ -1,6 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
 using MusicStream.Application.Interfaces;
-using MusicStream.Domain.Entities;
 using MusicStream.Infrastructure.FileManagement;
 using MusicStream.Infrastructure.Persistence.Postgres;
 

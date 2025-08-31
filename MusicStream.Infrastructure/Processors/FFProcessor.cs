@@ -16,8 +16,8 @@ namespace MusicStream.Infrastructure.Processors
 
     internal class FFProcessor
     {
-        private const string FFMPEGPATH = @"C:\Users\rezaj\AppData\Local\Microsoft\WinGet\Packages\Gyan.FFmpeg.Essentials_Microsoft.Winget.Source_8wekyb3d8bbwe\ffmpeg-7.1.1-essentials_build\bin\ffmpeg.exe";
-        private const string FFPROBEPATH = @"C:\Users\rezaj\AppData\Local\Microsoft\WinGet\Packages\Gyan.FFmpeg.Essentials_Microsoft.Winget.Source_8wekyb3d8bbwe\ffmpeg-7.1.1-essentials_build\bin\ffprobe.exe";
+        private string FFMPEGPATH = Environment.GetEnvironmentVariable("FFMPEGPATH") ?? @"C:\Users\rezaj\AppData\Local\Microsoft\WinGet\Packages\Gyan.FFmpeg.Essentials_Microsoft.Winget.Source_8wekyb3d8bbwe\ffmpeg-7.1.1-essentials_build\bin\ffmpeg.exe";
+        private string FFPROBEPATH = Environment.GetEnvironmentVariable("FFPROBEPATH") ?? @"C:\Users\rezaj\AppData\Local\Microsoft\WinGet\Packages\Gyan.FFmpeg.Essentials_Microsoft.Winget.Source_8wekyb3d8bbwe\ffmpeg-7.1.1-essentials_build\bin\ffprobe.exe";
 
         public async Task<FFProbeResult?> ConvertForDash(string inputFile, string outputFolder)
         {

@@ -34,6 +34,7 @@ public static class ServiceCollectionExtension
 
         services.AddSingleton<FFProcessor>();
         services.AddSingleton<MusicFileProcessor>();
+        services.AddScoped<ISeeder, Seeder>();
 
         services.AddScoped<IMusicRepository, MusicRepository>();
         services.AddScoped<IUserRepository, UserRepository>();
@@ -54,20 +55,9 @@ public static class ServiceCollectionExtension
     private static void AddPostgres(this IServiceCollection services, IConfiguration configuration, IWebHostEnvironment environment)
     {
 
-        var connectionString = Environment.GetEnvironmentVariable("DB_CONNECTION")
-                               ?? configuration.GetConnectionString("Postgres")
-                               ?? throw new Exception("No DB connection string provided");
+        var connectionString = configuration.GetConnectionString("Postgres")
+        ?? throw new Exception("connection string problem");
 
-        var hostEnv = Environment.GetEnvironmentVariable("DB_HOST") ?? "localhost";
-        var userEnv = Environment.GetEnvironmentVariable("DB_USER") ?? "postgres";
-        var passwordEnv = Environment.GetEnvironmentVariable("DB_PASSWORD") ?? "password";
-        var dbEnv = Environment.GetEnvironmentVariable("DB_NAME") ?? "MusicStream";
-
-        var dockerConnectionString = $"Host={hostEnv};Port=5432;Username={userEnv};Password={passwordEnv};Database={dbEnv};SSL Mode=Disable;Trust Server Certificate=true;";
-
-        var finalConnectionString = Environment.GetEnvironmentVariable("DB_CONNECTION") == null
-                                    ? dockerConnectionString
-                                    : connectionString;
 
         services.AddScoped<IInterceptor, AuditableInterceptor>();
         services.AddDbContext<AppDbContext>((provider, options) =>
@@ -75,7 +65,7 @@ public static class ServiceCollectionExtension
             var interceptors = provider.GetServices<IInterceptor>()
                                ?? throw new Exception("problem with interceptors");
             options.AddInterceptors(interceptors);
-            options.UseNpgsql(finalConnectionString);
+            options.UseNpgsql(connectionString);
 
             if (environment.IsDevelopment())
             {

@@ -1,4 +1,3 @@
-using System.Runtime.CompilerServices;
 using Microsoft.Extensions.Hosting;
 using MusicStream.Infrastructure.FileManagement;
 using MusicStream.Infrastructure.Processors;
@@ -8,7 +7,7 @@ namespace MusicStream.Infrastructure.BackgroundServices;
 internal class MusicProcessingBackgroundService
 (MusicFileProcessor processor) : BackgroundService
 {
-    private const string ROOTFOLDER = @"E:\ASP.NET\MusicStream\Music.APi\wwwroot";
+    private string ROOTFOLDER = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
     private readonly FileManager fileManager = new();
     private readonly SemaphoreSlim concurencyLimit = new(4);
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)

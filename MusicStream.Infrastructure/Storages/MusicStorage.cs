@@ -1,7 +1,6 @@
 using Minio;
 using Minio.DataModel.Args;
 using MusicStream.Application.Interfaces;
-using MusicStream.Infrastructure.FileManagement;
 using MusicStream.Infrastructure.Persistence.Minio;
 
 namespace MusicStream.Infrastructure.Storages;

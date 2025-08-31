@@ -1,6 +1,5 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using MusicStream.Domain.Entities;
 
 namespace MusicStream.Infrastructure.Persistence.Postgres.EntityConfigurations;
 

@@ -20,6 +20,7 @@ public class StreamEndpoint : IEndpoint
                               : "application/octet-stream";
             var key = $"{musicId}/{fileName}";
             var file = await fileStorage.DownloadFile(key);
+            Console.WriteLine($"End. {key}");
             return Results.File(file, contentType, fileName);
 
         })
