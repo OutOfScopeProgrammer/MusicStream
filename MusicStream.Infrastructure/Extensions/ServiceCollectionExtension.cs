@@ -17,15 +17,16 @@ using Microsoft.AspNetCore.Identity;
 using MusicStream.Domain.Entities;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 
 namespace MusicStream.Infrastructure.Extensions;
 
 public static class ServiceCollectionExtension
 {
-    public static void AddInfrastructureLayer(this IServiceCollection services, IConfiguration configuration, IWebHostEnvironment environment)
+    public static void AddInfrastructureLayer(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddMinio(configuration);
-        services.AddPostgres(configuration, environment);
+        services.AddPostgres(configuration);
         services.AddAuthServices(configuration);
         services.AddSingleton<IMusicStorage, MusicStorage>();
         services.AddScoped<IBucketManager, BucketManager>();
@@ -52,7 +53,7 @@ public static class ServiceCollectionExtension
         services.AddSingleton<MinioConnection>();
     }
 
-    private static void AddPostgres(this IServiceCollection services, IConfiguration configuration, IWebHostEnvironment environment)
+    private static void AddPostgres(this IServiceCollection services, IConfiguration configuration)
     {
 
         var connectionString = configuration.GetConnectionString("Postgres")
@@ -66,13 +67,12 @@ public static class ServiceCollectionExtension
                                ?? throw new Exception("problem with interceptors");
             options.AddInterceptors(interceptors);
             options.UseNpgsql(connectionString);
+            options.LogTo(_ => { }, LogLevel.None);
 
-            if (environment.IsDevelopment())
-            {
-                // Enable detailed errors only in development
-                options.EnableSensitiveDataLogging();
-                options.EnableDetailedErrors();
-            }
+            // Enable detailed errors only in development
+            // options.EnableSensitiveDataLogging();
+            // options.EnableDetailedErrors();
+
         });
     }
 

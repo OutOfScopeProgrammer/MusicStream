@@ -14,13 +14,11 @@ public class StreamEndpoint : IEndpoint
         group.MapGet("stream/{musicId}/{fileName}",
         async (string musicId, string fileName, IMusicStorage fileStorage, HttpContext context) =>
         {
-            Console.WriteLine(".......request");
             var contentType = fileName.EndsWith(".mpd") ? "application/dash+xml" :
                               fileName.EndsWith(".m4s") ? "application/iso.segment"
                               : "application/octet-stream";
             var key = $"{musicId}/{fileName}";
             var file = await fileStorage.DownloadFile(key);
-            Console.WriteLine($"End. {key}");
             return Results.File(file, contentType, fileName);
 
         })

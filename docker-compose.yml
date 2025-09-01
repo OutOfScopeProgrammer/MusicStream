@@ -1,6 +1,8 @@
 services:
   backend:
-    image: musicstream:v1
+    build:
+      context: .
+      dockerfile: Dockerfile
     container_name: backend
     env_file:
       - .env
@@ -15,7 +17,8 @@ services:
     image: nginx
     container_name: reverse-proxy
     ports:
-      - "8080:80"
+      - "80:80"
+      - "443:443"
     depends_on:
       - backend
     volumes:

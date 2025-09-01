@@ -8,8 +8,13 @@ public static class MusicDtoMapper
     {
         //Assumption: the stream url is always in this format : musicId/filename
         var parts = music.StreamUrl.Split("/");
+        var host = context.Request.Host;
+        var scheme = context.Request.Scheme;
         var streamUrl = linkGenerator.GetUriByName(context, "Stream",
-         new { musicId = parts[0], fileName = parts[1] });
+         new { musicId = parts[0], fileName = parts[1] },
+         host: host,
+         scheme: scheme
+         );
         if (streamUrl is null)
             throw new Exception("generating streamUrl failed");
         var dto = new MusicDto(music.Title, music.Artist, streamUrl);

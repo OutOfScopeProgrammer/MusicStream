@@ -38,20 +38,25 @@ internal class MusicStorage(MinioConnection minio) : IMusicStorage
         var tasks = new List<Task>();
         foreach (var file in files)
         {
+
             await concurencyLimit.WaitAsync();
             var relativePath = Path.GetRelativePath(rootFolder, file);
+
             var key = relativePath.Replace("\\", "/");
             var task = Task.Run(async () =>
             {
                 try
                 {
                     {
-                        using var stream = new FileStream(file, FileMode.Open, FileAccess.Read, FileShare.None);
+                        await Task.Delay(200);
+                        using var stream = new FileStream(file, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+                        stream.Position = 0;
                         await Storage.PutObjectAsync(new PutObjectArgs()
                             .WithBucket("music-bucket")
                             .WithObject(key)
                             .WithStreamData(stream)
-                            .WithContentType(""));
+                            .WithObjectSize(stream.Length)
+                                .WithContentType(""));
                     }
                 }
                 finally
