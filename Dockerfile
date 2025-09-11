@@ -33,6 +33,7 @@ WORKDIR /app
 COPY --from=build /src/MusicStream.API/app/publish .
 COPY docker-binaries/ffmpeg /usr/local/bin/ffmpeg
 COPY docker-binaries/ffprobe /usr/local/bin/ffprobe 
-
+RUN chmod +x /usr/local/bin/ffmpeg
+RUN chmod +x /usr/local/bin/ffprobe
 EXPOSE 5000
 ENTRYPOINT ["dotnet", "MusicStream.API.dll"]
