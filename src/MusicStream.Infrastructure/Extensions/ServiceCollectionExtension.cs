@@ -15,8 +15,6 @@ using MusicStream.Infrastructure.Persistence.Postgres.Interceptors;
 using MusicStream.Application.Interfaces.Auth;
 using Microsoft.AspNetCore.Identity;
 using MusicStream.Domain.Entities;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
 namespace MusicStream.Infrastructure.Extensions;

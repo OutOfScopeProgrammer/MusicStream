@@ -1,6 +1,5 @@
 using MusicStream.Domain.Entities;
 using MusicStream.Domain.Enums;
-using Xunit.Sdk;
 
 public class SubscriptionUnitTests
 {

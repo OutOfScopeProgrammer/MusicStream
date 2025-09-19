@@ -23,7 +23,7 @@ public class RefreshToken
 
     public bool IsValid()
     {
-        if (ExpirationTime < DateTime.UtcNow)
+        if (ExpirationTime > DateTime.UtcNow)
             return false;
 
         return true;
