@@ -32,4 +32,8 @@
     <PackageReference Include="xunit.runner.visualstudio" Version="3.1.4" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\MusicStream.Domain\MusicStream.Domain.csproj" />
+  </ItemGroup>
+
 </Project>
