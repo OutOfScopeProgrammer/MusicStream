@@ -45,7 +45,7 @@ public class SubscriptionUnitTests
         var result = sub.TryAddPlaylist(playList);
         // Assert
         Assert.True(result.IsSuccess);
-        Assert.Empty(result.Error);
+        Assert.Empty(result.Error!);
     }
 
 }
